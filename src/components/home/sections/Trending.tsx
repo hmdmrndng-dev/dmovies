@@ -1,11 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
-import { Card } from "./ui/card";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+import { useState } from "react";
+import { Carousel, CarouselContent, CarouselItem } from "../../ui/carousel";
+import { Card } from "../../ui/card";
+import { Button } from "../../ui/button";
+import { Badge } from "../../ui/badge";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../ui/dialog";
 import { cn } from "@/lib/utils";
+import { IconLoader } from "@tabler/icons-react";
+import { pickTrailer, type Video } from "@/lib/video-utils";
 
 type Data = {
   id: number;
@@ -25,13 +36,34 @@ type TmdbResponse = {
   results: Data[];
 };
 
-export default function Home({
+type Genre = {
+  id: number;
+  name: string;
+};
+
+export default function Trending({
   initialDatas,
   genres,
 }: {
   initialDatas: TmdbResponse;
-  genres: any[];
+  genres: Genre[];
 }) {
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
+  const [trailerTitle, setTrailerTitle] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function openTrailer(item: Data) {
+    setLoading(true);
+    setTrailerTitle(item.title || item.name);
+    try {
+      const res = await fetch(`/api/${item.media_type}/${item.id}/videos`);
+      const json = await res.json();
+      setTrailerKey(pickTrailer(json.results as Video[]));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <section className="w-full">
       <Carousel className="w-full">
@@ -123,7 +155,20 @@ export default function Home({
                   </p>
 
                   <div className="mt-8 flex items-center gap-4">
-                    <Button size="lg">Watch the trailer</Button>
+                    <Button
+                      size="lg"
+                      disabled={loading}
+                      onClick={() => openTrailer(data)}
+                    >
+                      {loading ? (
+                        <>
+                          Loading
+                          <IconLoader data-icon="inline-start" />
+                        </>
+                      ) : (
+                        "Watch Trailer"
+                      )}
+                    </Button>
                     <Button size="lg" variant="secondary">
                       More Info
                     </Button>
@@ -134,6 +179,33 @@ export default function Home({
           ))}
         </CarouselContent>
       </Carousel>
+
+      <Dialog
+        open={trailerKey !== null}
+        onOpenChange={(open) => !open && setTrailerKey(null)}
+      >
+        <DialogContent className="min-w-7xl">
+          <DialogHeader>
+            <DialogTitle>{trailerTitle}</DialogTitle>
+          </DialogHeader>
+          {trailerKey && (
+            <div className="aspect-video w-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
+                title={`${trailerTitle} Trailer`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture allowfullscreen"
+                allowFullScreen
+                className="h-full w-full"
+              />
+            </div>
+          )}
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Close</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

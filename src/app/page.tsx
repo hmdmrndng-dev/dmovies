@@ -1,4 +1,4 @@
-import Home from "@/components/Home";
+import Trending from "@/components/home/sections/Trending";
 import { tmdb } from "@/lib/tmdb";
 
 export default async function Page() {
@@ -8,5 +8,5 @@ export default async function Page() {
   ]);
   const data = popular.data;
   const genresData = genres.data.genres;
-  return <Home initialDatas={data} genres={genresData}/>;
+  return <Trending initialDatas={data} genres={genresData} />;
 }
