@@ -2,7 +2,11 @@ import Home from "@/components/Home";
 import { tmdb } from "@/lib/tmdb";
 
 export default async function Page() {
-  const response = await tmdb.get("/movie/popular?language=en-US&page=1");
-  const data = response.data;
-  return <Home data={data} />;
+  const [popular, genres] = await Promise.all([
+    tmdb.get("https://api.themoviedb.org/3/trending/all/day?language=en-US"),
+    tmdb.get("https://api.themoviedb.org/3/genre/movie/list?language=en-US"),
+  ]);
+  const data = popular.data;
+  const genresData = genres.data.genres;
+  return <Home initialDatas={data} genres={genresData}/>;
 }

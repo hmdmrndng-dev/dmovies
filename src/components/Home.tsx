@@ -5,74 +5,135 @@ import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { cn } from "@/lib/utils";
 
-export default function Home({ data }: { data: any }) {
+type Data = {
+  id: number;
+  title: string;
+  name: string;
+  overview: string;
+  backdrop_path: string | null;
+  vote_average: number;
+  adult: boolean;
+  genre_ids: number[];
+  release_date: string | null;
+  first_air_date: string | null;
+  media_type: "movie" | "tv";
+};
+
+type TmdbResponse = {
+  results: Data[];
+};
+
+export default function Home({
+  initialDatas,
+  genres,
+}: {
+  initialDatas: TmdbResponse;
+  genres: any[];
+}) {
   return (
-    <main className="w-full">
-      <section>
-        <Carousel className="w-full">
-          <CarouselContent>
-            {data.results.map((movie: any) => (
-              <CarouselItem key={movie.id} className=" h-screen">
-                <Card className="relative h-full w-full overflow-hidden border-none rounded-none bg-black">
-                  {movie.backdrop_path ? (
-                    <Image
-                      src={`https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`}
-                      alt={movie.title}
-                      fill
-                      priority={true}
-                      className="object-cover object-center"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-zinc-900 text-zinc-500">
-                      No Image Available
-                    </div>
-                  )}
+    <section className="w-full">
+      <Carousel className="w-full">
+        <CarouselContent>
+          {initialDatas.results.map((data) => (
+            <CarouselItem key={data.id} className="h-screen basis-full">
+              <Card className="relative h-full w-full overflow-hidden rounded-none border-none bg-black">
+                {data.backdrop_path ? (
+                  <Image
+                    src={`https://image.tmdb.org/t/p/w1280${data.backdrop_path}`}
+                    alt={data.title || data.name}
+                    fill
+                    priority
+                    className="object-cover object-center"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                    No Image Available
+                  </div>
+                )}
 
-                  <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-black/60 to-transparent" />
-                  <div className="absolute inset-0 z-20 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-black/60 to-transparent" />
+                <div className="absolute inset-0 z-20 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
 
-                  <div className="absolute bottom-0 left-0 z-30 flex h-full w-full flex-col justify-end p-8 md:p-16 lg:w-2/3 lg:p-24 text-white">
+                {/* dark class forces shadcn tokens to dark values over the always-dark image overlay */}
+                <div className="dark absolute bottom-0 left-0 z-30 flex h-full w-full flex-col justify-end p-8 md:p-16 lg:w-2/3 lg:p-24">
+                  <div className="flex gap-2">
                     <Badge
-                      variant="secondary"
-                      className="mb-4 w-fit bg-white/20 text-white backdrop-blur-sm border-none md:text-sm px-3 py-1"
+                      variant="outline"
+                      className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 font-semibold"
                     >
-                      Popular Movie
+                      Popular
                     </Badge>
 
-                    <h2 className="text-4xl font-extrabold tracking-tight drop-shadow-lg md:text-6xl lg:text-7xl">
-                      {movie.title}
-                    </h2>
+                    <Badge
+                      variant="outline"
+                      className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20 font-semibold"
+                    >
+                      {data.media_type === "movie" ? "Movie" : "TV Show"}
+                    </Badge>
 
-                    <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-300 drop-shadow md:text-lg">
-                      {movie.overview.length > 300
-                        ? movie.overview.substring(0, 300) + "..."
-                        : movie.overview}
-                    </p>
+                    <Badge
+                      variant="outline"
+                      className="flex items-center gap-1 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 font-semibold"
+                    >
+                      <span>
+                        TMDB{" "}
+                        {data.vote_average
+                          ? data.vote_average.toFixed(1)
+                          : "N/A"}
+                      </span>
+                    </Badge>
 
-                    <div className="mt-8 flex items-center gap-4">
-                      <Button
-                        size="lg"
-                        className="bg-white text-black hover:bg-zinc-200 font-bold px-8"
-                      >
-                        Watch Trailer
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 border-none px-8"
-                      >
-                        More Info
-                      </Button>
-                    </div>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "px-2.5 py-0.5 font-bold tracking-wider uppercase backdrop-blur-sm",
+                        data.adult
+                          ? "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400"
+                          : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+                      )}
+                    >
+                      {data.adult ? "R-Rated" : "PG-13"}
+                    </Badge>
                   </div>
-                </Card>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-        </Carousel>
-      </section>
-      
-    </main>
+                  <h2 className="text-4xl font-extrabold tracking-tight text-foreground drop-shadow-lg md:text-6xl lg:text-7xl">
+                    {data.title || data.name}{" "}
+                    {`(${new Date(
+                      data.release_date || data.first_air_date || "",
+                    ).getFullYear()})`}
+                  </h2>
+                  <div className="flex gap-2">
+                    {genres
+                      .filter((genre) => data.genre_ids.includes(genre.id))
+                      .map((genre) => (
+                        <Badge
+                          key={genre.id}
+                          variant="secondary"
+                          className="mb-4 w-fit"
+                        >
+                          {genre.name}
+                        </Badge>
+                      ))}
+                  </div>
+                  <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground drop-shadow md:text-lg">
+                    {data.overview.length > 300
+                      ? `${data.overview.substring(0, 300)}...`
+                      : data.overview}
+                  </p>
+
+                  <div className="mt-8 flex items-center gap-4">
+                    <Button size="lg">Watch the trailer</Button>
+                    <Button size="lg" variant="secondary">
+                      More Info
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+    </section>
   );
 }
