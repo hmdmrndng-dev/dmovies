@@ -1,7 +1,8 @@
-export default function Home() {
-  return (
-    <div>
-      <main className="flex min-h-screen flex-col items-center justify-between p-24"></main>
-    </div>
-  );
+import Home from "@/components/Home";
+import { tmdb } from "@/lib/tmdb";
+
+export default async function Page() {
+  const response = await tmdb.get("/movie/popular?language=en-US&page=1");
+  const data = response.data;
+  return <Home data={data} />;
 }

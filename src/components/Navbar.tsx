@@ -1,47 +1,44 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState } from "react"
-import { IconChevronDown } from "@tabler/icons-react"
-import { cn } from "@/lib/utils"
+import Link from "next/link";
+import { useState } from "react";
+import { IconChevronDown } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
 
-
-type NavLink  = { label: string; href: string }
-type NavItem  = { label: string; href?: string; children?: NavLink[] }
+type NavLink = { label: string; href: string };
+type NavItem = { label: string; href?: string; children?: NavLink[] };
 
 const NAV_ITEMS: NavItem[] = [
   {
     label: "Movies",
     href: "/movies",
     children: [
-      { label: "Popular",     href: "/movies/popular" },
+      { label: "Popular", href: "/movies/popular" },
       { label: "Now Playing", href: "/movies/now-playing" },
-      { label: "Upcoming",    href: "/movies/upcoming" },
-      { label: "Top Rated",   href: "/movies/top-rated" },
+      { label: "Upcoming", href: "/movies/upcoming" },
+      { label: "Top Rated", href: "/movies/top-rated" },
     ],
   },
   {
     label: "TV Shows",
     href: "/tv",
     children: [
-      { label: "Popular",       href: "/tv/popular" },
-      { label: "Airing Today",  href: "/tv/airing-today" },
-      { label: "On The Air",    href: "/tv/on-the-air" },
-      { label: "Top Rated",     href: "/tv/top-rated" },
+      { label: "Popular", href: "/tv/popular" },
+      { label: "Airing Today", href: "/tv/airing-today" },
+      { label: "On The Air", href: "/tv/on-the-air" },
+      { label: "Top Rated", href: "/tv/top-rated" },
     ],
   },
   { label: "People", href: "/people" },
-  { label: "About",  href: "/about" },
-]
-
+  { label: "About", href: "/about" },
+];
 
 export default function Navbar() {
-  const [open, setOpen] = useState<string | null>(null)
+  const [open, setOpen] = useState<string | null>(null);
 
   return (
-    <header className="border-b border-border bg-background">
+    <header className="sticky top-0 z-50 border-b border-border bg-background">
       <nav className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4">
-
         <Link
           href="/"
           className="text-lg font-bold tracking-tight text-primary"
@@ -68,13 +65,12 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               </li>
-            )
+            ),
           )}
         </ul>
-
       </nav>
     </header>
-  )
+  );
 }
 
 function DropdownItem({
@@ -83,27 +79,26 @@ function DropdownItem({
   onOpen,
   onClose,
 }: {
-  item: NavItem
-  isOpen: boolean
-  onOpen: () => void
-  onClose: () => void
+  item: NavItem;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
 }) {
   return (
-    <li
-      className="relative"
-      onMouseEnter={onOpen}
-      onMouseLeave={onClose}
-    >
+    <li className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
       <Link
         href={item.href!}
         className={cn(
-          "flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground",
+          "flex items-center gap-1 rounded-md px-3 py-1.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-muted hover:text-foreground sticky",
           isOpen && "bg-muted text-foreground",
         )}
       >
         {item.label}
         <IconChevronDown
-          className={cn("size-3.5 transition-transform", isOpen && "rotate-180")}
+          className={cn(
+            "size-3.5 transition-transform",
+            isOpen && "rotate-180",
+          )}
         />
       </Link>
 
@@ -122,5 +117,5 @@ function DropdownItem({
         </ul>
       )}
     </li>
-  )
+  );
 }
