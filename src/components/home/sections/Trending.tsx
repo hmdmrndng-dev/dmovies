@@ -1,8 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { Carousel, CarouselContent, CarouselItem } from "../../ui/carousel";
+import React, { useState } from "react";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+} from "../../ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import { Card } from "../../ui/card";
 import { Button } from "../../ui/button";
 import { Badge } from "../../ui/badge";
@@ -48,6 +54,15 @@ export default function Trending({
   initialDatas: TmdbResponse;
   genres: Genre[];
 }) {
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!api) return;
+    setCurrent(api.selectedScrollSnap());
+    api.on("select", () => setCurrent(api.selectedScrollSnap()));
+  }, [api]);
+
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [trailerTitle, setTrailerTitle] = useState("");
   const [loading, setLoading] = useState(false);
@@ -66,9 +81,18 @@ export default function Trending({
 
   return (
     <section className="w-full">
-      <Carousel className="w-full">
+      <Carousel
+        className="w-full"
+        setApi={setApi}
+        plugins={[
+          Autoplay({
+            delay: 4000,
+            stopOnInteraction: false,
+          }),
+        ]}
+      >
         <CarouselContent>
-          {initialDatas.results.map((data) => (
+          {initialDatas.results.slice(0, 10).map((data) => (
             <CarouselItem key={data.id} className="h-screen basis-full">
               <Card className="relative h-full w-full overflow-hidden rounded-none border-none bg-black">
                 {data.backdrop_path ? (
@@ -178,6 +202,20 @@ export default function Trending({
             </CarouselItem>
           ))}
         </CarouselContent>
+        <div className="absolute bottom-8 left-0 right-0 z-40 flex justify-center gap-2">
+          {initialDatas.results.slice(0, 10).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => api?.scrollTo(i)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === current
+                  ? "w-6 bg-primary shadow-lg shadow-primary/50"
+                  : "w-2 bg-white/30 hover:bg-white/50" /* Swapped to white/30 to pop against dark film backdrops */
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
       </Carousel>
 
       <Dialog
