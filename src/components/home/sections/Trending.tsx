@@ -223,7 +223,7 @@ export default function Trending({
           ))}
         </CarouselContent>
 
-        <div className="absolute bottom-3 left-0 right-0 z-40 flex justify-center gap-2">
+        <div className="absolute bottom-4 right-8 z-40 flex justify-center gap-2">
           {initialDatas.results.slice(0, 10).map((_, i) => (
             <button
               key={i}
