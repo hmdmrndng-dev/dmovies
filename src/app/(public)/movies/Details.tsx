@@ -112,7 +112,6 @@ export default function Details({
 
   return (
     <main className="mt-16">
-      {/* ── Backdrop Carousel ── */}
       <div className="relative">
         <Carousel
           className="w-full overflow-hidden transform-gpu [backface-visibility:hidden]"
@@ -140,7 +139,6 @@ export default function Details({
                     No Image Available
                   </div>
                 )}
-                {/* Fade bottom into page background */}
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
               </CarouselItem>
             ))}
@@ -165,11 +163,8 @@ export default function Details({
         </Carousel>
       </div>
 
-      {/* ── Movie Info ── */}
       <section className="relative z-10 -mt-16 md:-mt-24 px-4 md:px-8 xl:px-24 pb-12">
         <div className="flex flex-col md:flex-row gap-6 lg:gap-10">
-
-          {/* Left column: Poster + Actions */}
           <div className="flex flex-row md:flex-col gap-4 items-end md:items-stretch shrink-0 md:w-52 lg:w-64">
             <div className="w-28 sm:w-36 md:w-full rounded-xl overflow-hidden shadow-2xl ring-1 ring-border">
               {movies.poster_path ? (
@@ -188,22 +183,6 @@ export default function Details({
             </div>
 
             <div className="flex flex-col gap-3 flex-1 md:flex-none">
-              <Button
-                size="lg"
-                disabled={loading}
-                onClick={() => openTrailer(movies)}
-                className="w-full"
-              >
-                {loading ? (
-                  <>
-                    Loading
-                    <IconLoader className="ml-2 animate-spin" />
-                  </>
-                ) : (
-                  "Watch Trailer"
-                )}
-              </Button>
-
               {socialLinks.filter((l) => l.id).length > 0 && (
                 <div className="flex gap-2 flex-wrap">
                   {socialLinks
@@ -228,12 +207,25 @@ export default function Details({
                     ))}
                 </div>
               )}
+              <Button
+                size="lg"
+                disabled={loading}
+                onClick={() => openTrailer(movies)}
+                className="w-full"
+              >
+                {loading ? (
+                  <>
+                    Loading
+                    <IconLoader className="ml-2 animate-spin" />
+                  </>
+                ) : (
+                  "Watch Trailer"
+                )}
+              </Button>
             </div>
           </div>
 
-          {/* Right column: Movie Info */}
           <div className="flex flex-col gap-4 flex-1 min-w-0 pt-2">
-            {/* Status badges */}
             <div className="flex flex-wrap gap-2">
               <Badge
                 variant="outline"
@@ -267,12 +259,10 @@ export default function Details({
               </Badge>
             </div>
 
-            {/* Title */}
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
               {movies.title}
             </h1>
 
-            {/* Release date + Tagline */}
             <div className="flex flex-col gap-1">
               <p className="text-sm text-muted-foreground">
                 {movies.release_date
@@ -289,7 +279,6 @@ export default function Details({
               )}
             </div>
 
-            {/* Genres + Runtime */}
             <div className="flex flex-wrap gap-2 items-center">
               {movies.genres?.map((genre) => (
                 <Badge key={genre.id} variant="secondary">
@@ -306,7 +295,6 @@ export default function Details({
               )}
             </div>
 
-            {/* Overview */}
             <div>
               <h2 className="font-semibold text-base mb-2">Overview</h2>
               <p className="text-sm leading-relaxed text-muted-foreground">
@@ -317,7 +305,6 @@ export default function Details({
         </div>
       </section>
 
-      {/* ── Trailer Dialog ── */}
       <Dialog
         open={trailerKey !== null}
         onOpenChange={(open) => !open && setTrailerKey(null)}
