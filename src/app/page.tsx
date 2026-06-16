@@ -1,3 +1,4 @@
+import Upcoming from "@/components/home/sections/Upcoming";
 import Trending from "@/components/home/sections/Trending";
 import { tmdb } from "@/lib/tmdb";
 
@@ -8,5 +9,18 @@ export default async function Page() {
   ]);
   const data = popular.data;
   const genresData = genres.data.genres;
-  return <Trending initialDatas={data} genres={genresData} />;
+
+  const [upcoming] = await Promise.all([
+    tmdb.get(
+      "https://api.themoviedb.org/3/movie/upcoming?language=en-US&page=1",
+    ),
+  ]);
+  const upcomingData = upcoming.data;
+
+  return (
+    <>
+      <Trending initialDatas={data} genres={genresData} />
+      <Upcoming initialDatas={upcomingData} />
+    </>
+  );
 }

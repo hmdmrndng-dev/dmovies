@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Carousel,
   CarouselApi,
@@ -246,9 +246,7 @@ export default function Trending({
             <DialogTitle className="px-2 pt-2 sm:p-0 text-lg sm:text-xl font-bold tracking-tight">
               {trailerTitle}
             </DialogTitle>
-            <DialogDescription>
-              {trailerDescription}
-            </DialogDescription>
+            <DialogDescription>{trailerDescription}</DialogDescription>
           </DialogHeader>
 
           {trailerKey && (
