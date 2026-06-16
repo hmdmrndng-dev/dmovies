@@ -82,7 +82,7 @@ export default function Trending({
   return (
     <section className="w-full">
       <Carousel
-        className="w-full"
+        className="w-full overflow-hidden transform-gpu"
         setApi={setApi}
         plugins={[
           Autoplay({
@@ -202,7 +202,7 @@ export default function Trending({
             </CarouselItem>
           ))}
         </CarouselContent>
-        <div className="absolute bottom-8 left-0 right-0 z-40 flex justify-center gap-2">
+        <div className="absolute bottom-3 left-0 right-0 z-40 flex justify-center gap-2">
           {initialDatas.results.slice(0, 10).map((_, i) => (
             <button
               key={i}
