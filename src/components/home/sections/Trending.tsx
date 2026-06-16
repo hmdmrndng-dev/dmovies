@@ -1,17 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Carousel,
   CarouselApi,
   CarouselContent,
   CarouselItem,
-} from "../../ui/carousel";
+} from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import { Card } from "../../ui/card";
-import { Button } from "../../ui/button";
-import { Badge } from "../../ui/badge";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogClose,
@@ -19,7 +19,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../ui/dialog";
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { IconLoader } from "@tabler/icons-react";
 import { pickTrailer, type Video } from "@/lib/video-utils";
@@ -54,10 +54,18 @@ export default function Trending({
   initialDatas: TmdbResponse;
   genres: Genre[];
 }) {
-  const [api, setApi] = React.useState<CarouselApi>();
-  const [current, setCurrent] = React.useState(0);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
 
-  React.useEffect(() => {
+  // ✅ FIX 1: Autoplay locked in a useRef so it survives re-renders and doesn't break
+  const autoplayPlugin = useRef(
+    Autoplay({
+      delay: 4000,
+      stopOnInteraction: false,
+    }),
+  );
+
+  useEffect(() => {
     if (!api) return;
     setCurrent(api.selectedScrollSnap());
     api.on("select", () => setCurrent(api.selectedScrollSnap()));
@@ -82,26 +90,30 @@ export default function Trending({
   return (
     <section className="w-full">
       <Carousel
-        className="w-full overflow-hidden transform-gpu"
+        // ✅ FIX 2: Added backface-visibility to stop iOS Safari transition flickering
+        className="w-full overflow-hidden transform-gpu [backface-visibility:hidden]"
         setApi={setApi}
-        plugins={[
-          Autoplay({
-            delay: 4000,
-            stopOnInteraction: false,
-          }),
-        ]}
+        plugins={[autoplayPlugin.current]}
       >
-        <CarouselContent>
-          {initialDatas.results.slice(0, 10).map((data) => (
-            <CarouselItem key={data.id} className="h-screen basis-full">
+        {/* ✅ FIX 3: Added will-change-transform to tell the mobile GPU to prepare for swiping */}
+        <CarouselContent className="will-change-transform">
+          {initialDatas.results.slice(0, 10).map((data, index) => (
+            <CarouselItem
+              key={data.id}
+              className="h-screen basis-full [backface-visibility:hidden]"
+            >
               <Card className="relative h-full w-full overflow-hidden rounded-none border-none bg-black">
                 {data.backdrop_path ? (
                   <Image
+                    // ✅ FIX 4: Kept your w1280 resolution, but added proper 'sizes' mapping for phones
                     src={`https://image.tmdb.org/t/p/w1280${data.backdrop_path}`}
                     alt={data.title || data.name}
                     fill
-                    priority
-                    className="object-cover object-center"
+                    // ✅ FIX 5: ONLY preload the first slide. Lazy load the rest to fix the mobile freeze!
+                    priority={index === 0}
+                    loading={index === 0 ? undefined : "lazy"}
+                    sizes="(max-width: 768px) 100vw, 1280px"
+                    className="object-cover object-center pointer-events-none"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
@@ -109,12 +121,11 @@ export default function Trending({
                   </div>
                 )}
 
-                <div className="absolute inset-0 z-20 bg-gradient-to-t from-black via-black/60 to-transparent" />
-                <div className="absolute inset-0 z-20 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+                {/* ✅ FIX 6: Combined the two expensive gradients into one seamless layer */}
+                <div className="absolute inset-0 z-20 bg-gradient-to-tr from-black via-black/70 to-black/10" />
 
-                {/* dark class forces shadcn tokens to dark values over the always-dark image overlay */}
                 <div className="dark absolute bottom-0 left-0 z-30 flex h-full w-full flex-col justify-end p-8 md:p-16 lg:w-2/3 lg:p-24">
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     <Badge
                       variant="outline"
                       className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 font-semibold"
@@ -153,26 +164,29 @@ export default function Trending({
                       {data.adult ? "R-Rated" : "PG-13"}
                     </Badge>
                   </div>
+
                   <h2 className="text-4xl font-extrabold tracking-tight text-foreground drop-shadow-lg md:text-6xl lg:text-7xl">
                     {data.title || data.name}{" "}
                     {`(${new Date(
                       data.release_date || data.first_air_date || "",
                     ).getFullYear()})`}
                   </h2>
-                  <div className="flex gap-2">
+
+                  <div className="flex flex-wrap gap-2 mt-4">
                     {genres
                       .filter((genre) => data.genre_ids.includes(genre.id))
                       .map((genre) => (
                         <Badge
                           key={genre.id}
                           variant="secondary"
-                          className="mb-4 w-fit"
+                          className="w-fit"
                         >
                           {genre.name}
                         </Badge>
                       ))}
                   </div>
-                  <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground drop-shadow md:text-lg">
+
+                  <p className="mt-4 max-w-2xl text-sm leading-relaxed text-gray-300 drop-shadow md:text-lg">
                     {data.overview.length > 300
                       ? `${data.overview.substring(0, 300)}...`
                       : data.overview}
@@ -187,13 +201,20 @@ export default function Trending({
                       {loading ? (
                         <>
                           Loading
-                          <IconLoader data-icon="inline-start" />
+                          <IconLoader
+                            data-icon="inline-start"
+                            className="ml-2 animate-spin"
+                          />
                         </>
                       ) : (
                         "Watch Trailer"
                       )}
                     </Button>
-                    <Button size="lg" variant="secondary">
+                    <Button
+                      size="lg"
+                      variant="secondary"
+                      className="bg-white/10 hover:bg-white/20 border-none backdrop-blur-sm text-white"
+                    >
                       More Info
                     </Button>
                   </div>
@@ -202,7 +223,8 @@ export default function Trending({
             </CarouselItem>
           ))}
         </CarouselContent>
-        <div className="absolute bottom-3 left-0 right-0 z-40 flex justify-center gap-2">
+
+        <div className="absolute bottom-6 left-0 right-0 z-40 flex justify-center gap-2">
           {initialDatas.results.slice(0, 10).map((_, i) => (
             <button
               key={i}
@@ -210,7 +232,7 @@ export default function Trending({
               className={`h-2 rounded-full transition-all duration-300 ${
                 i === current
                   ? "w-6 bg-primary shadow-lg shadow-primary/50"
-                  : "w-2 bg-white/30 hover:bg-white/50" /* Swapped to white/30 to pop against dark film backdrops */
+                  : "w-2 bg-white/40 hover:bg-white/60"
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />
@@ -218,28 +240,36 @@ export default function Trending({
         </div>
       </Carousel>
 
+      {/* ✅ FIX 7: Modal is now beautifully responsive on mobile devices */}
       <Dialog
         open={trailerKey !== null}
         onOpenChange={(open) => !open && setTrailerKey(null)}
       >
-        <DialogContent className="min-w-7xl">
+        <DialogContent className="w-[95vw] max-w-7xl sm:w-full p-2 sm:p-6 gap-2 sm:gap-4 border-none bg-zinc-950 text-white">
           <DialogHeader>
-            <DialogTitle>{trailerTitle}</DialogTitle>
+            <DialogTitle className="px-2 pt-4 sm:p-0 text-xl font-bold">
+              {trailerTitle}
+            </DialogTitle>
           </DialogHeader>
+
           {trailerKey && (
-            <div className="aspect-video w-full">
+            <div className="aspect-video w-full overflow-hidden rounded-md bg-black">
               <iframe
                 src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
                 title={`${trailerTitle} Trailer`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture allowfullscreen"
+                // ✅ FIX 8: Added the missing semicolon after picture-in-picture
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
-                className="h-full w-full"
+                className="h-full w-full border-none"
               />
             </div>
           )}
-          <DialogFooter>
+
+          <DialogFooter className="px-2 pb-4 sm:p-0">
             <DialogClose asChild>
-              <Button variant="outline">Close</Button>
+              <Button variant="secondary" className="w-full sm:w-auto">
+                Close
+              </Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
