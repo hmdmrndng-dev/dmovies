@@ -49,7 +49,7 @@ export default function Navbar() {
   const [open, setOpen] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
-  const { setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   const closeMobile = () => {
     setMobileOpen(false);
@@ -91,28 +91,18 @@ export default function Navbar() {
           )}
         </ul>
 
-        {/* Right side controls */}
         <div className="ml-auto flex items-center gap-1">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="lg">
-                <IconSun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                <IconMoon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={() =>
+              setTheme(resolvedTheme === "dark" ? "light" : "dark")
+            }
+          >
+            <IconSun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+            <IconMoon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
 
           <Button
             variant="ghost"
@@ -158,7 +148,7 @@ export default function Navbar() {
                           <Link
                             href={child.href}
                             className={cn(
-                              buttonVariants({ variant: "ghost", size: "lg"  }),
+                              buttonVariants({ variant: "ghost", size: "lg" }),
                               "w-full justify-start",
                             )}
                             onClick={closeMobile}
@@ -175,7 +165,7 @@ export default function Navbar() {
                   <Link
                     href={item.href!}
                     className={cn(
-                      buttonVariants({ variant: "ghost", size: "lg"  }),
+                      buttonVariants({ variant: "ghost", size: "lg" }),
                       "w-full justify-start",
                     )}
                     onClick={closeMobile}
@@ -222,7 +212,7 @@ function DropdownItem({
               <Link
                 href={child.href}
                 className={cn(
-                  buttonVariants({ variant: "ghost", size: "lg"  }),
+                  buttonVariants({ variant: "ghost", size: "lg" }),
                   "w-full justify-start",
                 )}
               >

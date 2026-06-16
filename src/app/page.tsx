@@ -1,6 +1,7 @@
 import Upcoming from "@/components/home/sections/Upcoming";
 import Trending from "@/components/home/sections/Trending";
 import { tmdb } from "@/lib/tmdb";
+import OnTheAir from "@/components/home/sections/OnTheAir";
 
 export default async function Page() {
   const [popular, genres] = await Promise.all([
@@ -17,10 +18,18 @@ export default async function Page() {
   ]);
   const upcomingData = upcoming.data;
 
+  const [onTheAir] = await Promise.all([
+    tmdb.get(
+      "https://api.themoviedb.org/3/tv/on_the_air?language=en-US&page=1",
+    ),
+  ]);
+  const onTheAirData = onTheAir.data;
+
   return (
     <>
       <Trending initialDatas={data} genres={genresData} />
       <Upcoming initialDatas={upcomingData} />
+      <OnTheAir initialDatas={onTheAirData} />
     </>
   );
 }
