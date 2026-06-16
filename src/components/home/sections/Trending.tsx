@@ -19,6 +19,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { IconLoader } from "@tabler/icons-react";
@@ -57,7 +58,6 @@ export default function Trending({
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
-  // ✅ FIX 1: Autoplay locked in a useRef so it survives re-renders and doesn't break
   const autoplayPlugin = useRef(
     Autoplay({
       delay: 4000,
@@ -73,11 +73,13 @@ export default function Trending({
 
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [trailerTitle, setTrailerTitle] = useState("");
+  const [trailerDescription, setTrailerDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function openTrailer(item: Data) {
     setLoading(true);
     setTrailerTitle(item.title || item.name);
+    setTrailerDescription(item.overview);
     try {
       const res = await fetch(`/api/${item.media_type}/${item.id}/videos`);
       const json = await res.json();
@@ -90,26 +92,22 @@ export default function Trending({
   return (
     <section className="w-full">
       <Carousel
-        // ✅ FIX 2: Added backface-visibility to stop iOS Safari transition flickering
         className="w-full overflow-hidden transform-gpu [backface-visibility:hidden]"
         setApi={setApi}
         plugins={[autoplayPlugin.current]}
       >
-        {/* ✅ FIX 3: Added will-change-transform to tell the mobile GPU to prepare for swiping */}
-        <CarouselContent className="will-change-transform">
+        <CarouselContent className="will-change-transform ml-0">
           {initialDatas.results.slice(0, 10).map((data, index) => (
             <CarouselItem
               key={data.id}
-              className="h-screen basis-full [backface-visibility:hidden]"
+              className="h-screen basis-full pl-0 [backface-visibility:hidden]"
             >
               <Card className="relative h-full w-full overflow-hidden rounded-none border-none bg-black">
                 {data.backdrop_path ? (
                   <Image
-                    // ✅ FIX 4: Kept your w1280 resolution, but added proper 'sizes' mapping for phones
                     src={`https://image.tmdb.org/t/p/w1280${data.backdrop_path}`}
                     alt={data.title || data.name}
                     fill
-                    // ✅ FIX 5: ONLY preload the first slide. Lazy load the rest to fix the mobile freeze!
                     priority={index === 0}
                     loading={index === 0 ? undefined : "lazy"}
                     sizes="(max-width: 768px) 100vw, 1280px"
@@ -121,7 +119,6 @@ export default function Trending({
                   </div>
                 )}
 
-                {/* ✅ FIX 6: Combined the two expensive gradients into one seamless layer */}
                 <div className="absolute inset-0 z-20 bg-gradient-to-tr from-black via-black/70 to-black/10" />
 
                 <div className="dark absolute bottom-0 left-0 z-30 flex h-full w-full flex-col justify-end p-8 md:p-16 lg:w-2/3 lg:p-24">
@@ -224,7 +221,7 @@ export default function Trending({
           ))}
         </CarouselContent>
 
-        <div className="absolute bottom-6 left-0 right-0 z-40 flex justify-center gap-2">
+        <div className="absolute bottom-3 left-0 right-0 z-40 flex justify-center gap-2">
           {initialDatas.results.slice(0, 10).map((_, i) => (
             <button
               key={i}
@@ -240,24 +237,25 @@ export default function Trending({
         </div>
       </Carousel>
 
-      {/* ✅ FIX 7: Modal is now beautifully responsive on mobile devices */}
       <Dialog
         open={trailerKey !== null}
         onOpenChange={(open) => !open && setTrailerKey(null)}
       >
-        <DialogContent className="w-[95vw] max-w-7xl sm:w-full p-2 sm:p-6 gap-2 sm:gap-4 border-none bg-zinc-950 text-white">
+        <DialogContent className="w-[95vw] md:w-[88vw] lg:w-[80vw] xl:w-[75vw] 2xl:w-[70vw] sm:max-w-[1800px] p-2 sm:p-4 gap-3 border-none bg-zinc-950 text-white">
           <DialogHeader>
-            <DialogTitle className="px-2 pt-4 sm:p-0 text-xl font-bold">
+            <DialogTitle className="px-2 pt-2 sm:p-0 text-lg sm:text-xl font-bold tracking-tight">
               {trailerTitle}
             </DialogTitle>
+            <DialogDescription>
+              {trailerDescription}
+            </DialogDescription>
           </DialogHeader>
 
           {trailerKey && (
-            <div className="aspect-video w-full overflow-hidden rounded-md bg-black">
+            <div className="aspect-video w-full overflow-hidden rounded-md bg-black shadow-2xl shadow-black/50">
               <iframe
                 src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
                 title={`${trailerTitle} Trailer`}
-                // ✅ FIX 8: Added the missing semicolon after picture-in-picture
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 className="h-full w-full border-none"
@@ -265,9 +263,12 @@ export default function Trending({
             </div>
           )}
 
-          <DialogFooter className="px-2 pb-4 sm:p-0">
+          <DialogFooter className="px-2 pb-2 sm:p-0">
             <DialogClose asChild>
-              <Button variant="secondary" className="w-full sm:w-auto">
+              <Button
+                variant="secondary"
+                className="w-full sm:w-auto font-medium"
+              >
                 Close
               </Button>
             </DialogClose>
