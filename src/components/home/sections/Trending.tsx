@@ -77,12 +77,12 @@ export default function Trending({
   const [trailerDescription, setTrailerDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function openTrailer(item: Data) {
+  async function openTrailer(data: Data) {
     setLoading(true);
-    setTrailerTitle(item.title || item.name);
-    setTrailerDescription(item.overview);
+    setTrailerTitle(data.title || data.name);
+    setTrailerDescription(data.overview);
     try {
-      const res = await fetch(`/api/${item.media_type}/${item.id}/videos`);
+      const res = await fetch(`/api/${data.media_type}/${data.id}/videos`);
       const json = await res.json();
       setTrailerKey(pickTrailer(json.results as Video[]));
     } finally {
@@ -117,13 +117,13 @@ export default function Trending({
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                      No Image Available
+                      🎬
                     </div>
                   )}
 
-                  <div className="absolute inset-0 z-20 bg-gradient-to-tr from-black via-black/70 to-black/10" />
+                  <div className="absolute inset-0 z-20 bg-gradient-to-t from-background via-background/70 to-transparent" />
 
-                  <div className="dark absolute bottom-0 left-0 z-30 flex h-full w-full flex-col justify-end p-8 md:p-16 lg:w-2/3 lg:p-24">
+                  <div className="absolute bottom-0 left-0 z-30 flex h-full w-full flex-col justify-end p-8 md:p-16 lg:w-2/3 lg:p-24">
                     <div className="flex flex-wrap gap-2 mb-4">
                       <Badge
                         variant="outline"
@@ -185,7 +185,7 @@ export default function Trending({
                         ))}
                     </div>
 
-                    <p className="mt-4 max-w-2xl text-sm leading-relaxed text-gray-300 drop-shadow md:text-lg">
+                    <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground drop-shadow md:text-lg">
                       {data.overview.length > 300
                         ? `${data.overview.substring(0, 300)}...`
                         : data.overview}
@@ -209,11 +209,7 @@ export default function Trending({
                           "Watch Trailer"
                         )}
                       </Button>
-                      <Button
-                        size="lg"
-                        variant="secondary"
-                        className="bg-white/10 hover:bg-white/20 border-none backdrop-blur-sm text-white"
-                      >
+                      <Button size="lg" variant="secondary">
                         <Link
                           href={`/${data.media_type}/${data.id}`}
                           key={data.id}
@@ -231,16 +227,18 @@ export default function Trending({
           ))}
         </CarouselContent>
 
-        <div className="absolute bottom-4 right-8 z-40 flex justify-center gap-2">
+        <div className="absolute bottom-4 right-8 z-40 flex items-center justify-center gap-1.5">
           {initialDatas.results.slice(0, 10).map((_, i) => (
             <button
               key={i}
               onClick={() => api?.scrollTo(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${
+              className={cn(
+                "h-2 rounded-full transition-all duration-300",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
                 i === current
-                  ? "w-6 bg-primary shadow-lg shadow-primary/50"
-                  : "w-2 bg-white/40 hover:bg-white/60"
-              }`}
+                  ? "w-6 bg-primary"
+                  : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50 dark:bg-muted/40 dark:hover:bg-muted/80",
+              )}
               aria-label={`Go to slide ${i + 1}`}
             />
           ))}

@@ -53,7 +53,7 @@ export default function Upcoming({
               </div>
             ) : (
               <div className="w-48 h-72 bg-gray-300 rounded-md flex items-center justify-center">
-                No Image
+                🎬
               </div>
             )}
             <div className="flex flex-col">

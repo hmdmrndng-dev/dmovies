@@ -59,22 +59,22 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <ul className="ml-auto hidden items-center gap-1 md:flex">
-          {NAV_ITEMS.map((item) =>
-            item.children ? (
+          {NAV_ITEMS.map((data) =>
+            data.children ? (
               <DropdownItem
-                key={item.label}
-                item={item}
-                isOpen={open === item.label}
-                onOpen={() => setOpen(item.label)}
+                key={data.label}
+                item={data}
+                isOpen={open === data.label}
+                onOpen={() => setOpen(data.label)}
                 onClose={() => setOpen(null)}
               />
             ) : (
-              <li key={item.label}>
+              <li key={data.label}>
                 <Link
-                  href={item.href!}
+                  href={data.href!}
                   className={buttonVariants({ variant: "ghost", size: "lg" })}
                 >
-                  {item.label}
+                  {data.label}
                 </Link>
               </li>
             ),
@@ -82,7 +82,9 @@ export default function Navbar() {
         </ul>
 
         <div className="ml-auto flex items-center gap-1">
-          <Suspense><SearchBar /></Suspense>
+          <Suspense>
+            <SearchBar />
+          </Suspense>
           <Button
             variant="ghost"
             size="lg"
@@ -99,30 +101,30 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="bg-background/95 px-4 pb-4 md:hidden">
           <ul className="flex flex-col gap-1 pt-2">
-            {NAV_ITEMS.map((item) =>
-              item.children ? (
-                <li key={item.label}>
+            {NAV_ITEMS.map((data) =>
+              data.children ? (
+                <li key={data.label}>
                   <Button
                     variant="ghost"
                     size="lg"
                     className="w-full justify-between"
                     onClick={() =>
                       setMobileExpanded((prev) =>
-                        prev === item.label ? null : item.label,
+                        prev === data.label ? null : data.label,
                       )
                     }
                   >
-                    {item.label}
+                    {data.label}
                     <IconChevronDown
                       className={cn(
                         "size-3.5 transition-transform",
-                        mobileExpanded === item.label && "rotate-180",
+                        mobileExpanded === data.label && "rotate-180",
                       )}
                     />
                   </Button>
-                  {mobileExpanded === item.label && (
+                  {mobileExpanded === data.label && (
                     <ul className="ml-3 mt-1 flex flex-col border-l border-border pl-3">
-                      {item.children.map((child) => (
+                      {data.children.map((child) => (
                         <li key={child.href}>
                           <Link
                             href={child.href}
@@ -140,16 +142,16 @@ export default function Navbar() {
                   )}
                 </li>
               ) : (
-                <li key={item.label}>
+                <li key={data.label}>
                   <Link
-                    href={item.href!}
+                    href={data.href!}
                     className={cn(
                       buttonVariants({ variant: "ghost", size: "lg" }),
                       "w-full justify-start",
                     )}
                     onClick={closeMobile}
                   >
-                    {item.label}
+                    {data.label}
                   </Link>
                 </li>
               ),
@@ -162,7 +164,7 @@ export default function Navbar() {
 }
 
 function DropdownItem({
-  item,
+  item: data,
   isOpen,
   onOpen,
   onClose,
@@ -175,7 +177,7 @@ function DropdownItem({
   return (
     <li className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
       <Button variant="ghost" size="lg" className={cn(isOpen && "bg-muted")}>
-        {item.label}
+        {data.label}
         <IconChevronDown
           className={cn(
             "size-3.5 transition-transform",
@@ -186,7 +188,7 @@ function DropdownItem({
 
       {isOpen && (
         <ul className="absolute left-0 top-full z-50 min-w-44 rounded-md border border-border bg-popover p-1 shadow-md">
-          {item.children!.map((child) => (
+          {data.children!.map((child) => (
             <li key={child.href}>
               <Link
                 href={child.href}

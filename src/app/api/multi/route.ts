@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get("query");
+  const page = req.nextUrl.searchParams.get("page") || "1";
 
   if (!query || query.trim() === "") {
     return NextResponse.json({ results: [] });
@@ -14,6 +15,7 @@ export async function GET(req: NextRequest) {
         query: query,
         include_adult: false,
         language: "en-US",
+        page: page, 
       },
     });
 

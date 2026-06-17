@@ -5,6 +5,8 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { IconLoader } from "@tabler/icons-react";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type SearchResult = {
   id: number;
@@ -22,32 +24,68 @@ function SearchResults() {
 
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  
+  // 🚨 State hooks to track page locations
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
+  // Effect 1: Fires ONLY when a fresh search string is typed/submitted
   useEffect(() => {
     if (!q.trim()) {
       setResults([]);
+      setPage(1);
+      setTotalPages(0);
       return;
     }
 
-    async function fetchNewData() {
+    async function initializeSearch() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/multi?query=${encodeURIComponent(q)}`);
+        const res = await fetch(`/api/multi?query=${encodeURIComponent(q)}&page=1`);
         const data = await res.json();
 
         const filtered = (data.results || []).filter(
           (item: SearchResult) => item.media_type !== "person",
         );
+        
         setResults(filtered);
+        setPage(1); // Reset back to page 1 for a new search term
+        setTotalPages(data.total_pages || 0);
       } catch (error) {
-        console.error("Real-time fetch error:", error);
+        console.error("Initial search error:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchNewData();
+    initializeSearch();
   }, [q]);
+
+  // 🚨 Function handler to fetch subsequent pages and append them
+  async function loadMorePages() {
+    if (loading || page >= totalPages) return;
+
+    const nextPage = page + 1;
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/multi?query=${encodeURIComponent(q)}&page=${nextPage}`);
+      const data = await res.json();
+
+      const filtered = (data.results || []).filter(
+        (item: SearchResult) => item.media_type !== "person",
+      );
+
+      // Append new items to your existing cards seamlessly
+      setResults((prev) => [...prev, ...filtered]);
+      setPage(nextPage);
+    } catch (error) {
+      console.error("Load more pages error:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (!q) {
     return (
       <main className="w-full gap-4 px-6 py-4 xl:px-24 text-center">
@@ -59,14 +97,14 @@ function SearchResults() {
   }
 
   return (
-    <main className="w-full gap-4 px-6 py-4 xl:px-24 mt-16">
+    <main className="w-full gap-4 px-6 py-4 xl:px-24 mt-16 pb-24">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">
             Search Results for <span className="text-zinc-400">"{q}"</span>
           </h1>
           <p className="text-zinc-500 mt-2">
-            Found {results.length} matching titles
+            Showing {results.length} matching titles
           </p>
         </div>
 
@@ -75,6 +113,7 @@ function SearchResults() {
         )}
       </div>
 
+      {/* Loading Skeleton */}
       {loading && results.length === 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
           {[...Array(6)].map((_, i) => (
@@ -88,52 +127,75 @@ function SearchResults() {
       ) : results.length === 0 ? (
         <div className="py-12 text-center text-zinc-500">
           No movies or TV shows found. Try a different term.
-        </div>  
+        </div>
       ) : (
-        <div
-          className={`grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 transition-opacity ${loading ? "opacity-50" : "opacity-100"}`}
-        >
-          {results.map((item) => {
-            const displayName = item.title || item.name;
-            const targetDate = item.release_date || item.first_air_date;
-            const releaseYear = targetDate
-              ? new Date(targetDate).getFullYear()
-              : "";
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 justify-center gap-4">
+            {/* 🚨 Looping directly through all items collected across pages */}
+            {results.map((data, index) => {
+              const displayName = data.title || data.name;
+              const targetDate = data.release_date || data.first_air_date;
+              const releaseYear = targetDate ? new Date(targetDate).getFullYear() : "";
 
-            return (
-              <Link
-                key={`${item.media_type}-${item.id}`}
-                href={`/${item.media_type}/${item.id}`}
-                className="group flex flex-col gap-2 transition-transform hover:scale-105"
-              >
-                <div className="relative aspect-[2/3] w-full overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-                  {item.poster_path ? (
-                    <Image
-                      src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                      alt={displayName || "Poster"}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 20vw, 16vw"
-                    />
+              return (
+                <Link
+                  key={`${data.media_type}-${data.id}-${index}`}
+                  href={`/${data.media_type}/${data.id}`}
+                  className="flex flex-col p-0 gap-0 bg-transparent ring-0 hover:scale-105 transition-transform duration-200 group"
+                >
+                  {data.poster_path ? (
+                    <div className="relative w-full aspect-[10/16] overflow-hidden rounded-xl">
+                      <Image
+                        src={`https://image.tmdb.org/t/p/w500${data.poster_path}`}
+                        alt={displayName || "Poster"}
+                        fill
+                        priority={index < 4}
+                        loading={index < 4 ? undefined : "lazy"}
+                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 15vw"
+                        className="object-cover pointer-events-none"
+                      />
+                    </div>
                   ) : (
-                    <div className="flex h-full items-center justify-center text-4xl">
+                    <div className="w-full aspect-[10/16] bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center text-4xl select-none shadow-md">
                       🎬
                     </div>
                   )}
-                </div>
 
-                <div className="flex flex-col">
-                  <span className="truncate text-sm font-medium text-zinc-200 group-hover:text-white">
-                    {displayName}
-                  </span>
-                  <span className="text-xs text-zinc-500 capitalize">
-                    {item.media_type} {releaseYear && `• ${releaseYear}`}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+                  <div className="flex flex-col mt-2 px-1">
+                    <span className="truncate text-sm font-medium text-zinc-200 group-hover:text-white">
+                      {displayName}
+                    </span>
+                    <span className="text-xs text-zinc-500 capitalize">
+                      {data.media_type} {releaseYear && `• ${releaseYear}`}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* 🚨 Pure Shadcn Styled Pagination Trigger */}
+          {page < totalPages && (
+            <div className="mt-12 flex justify-center">
+              <button
+                onClick={loadMorePages}
+                disabled={loading}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "w-full max-w-xs font-medium border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-200 gap-2"
+                )}
+              >
+                {loading ? (
+                  <>
+                    <IconLoader className="h-4 w-4 animate-spin" /> Loading...
+                  </>
+                ) : (
+                  "Load More Results"
+                )}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </main>
   );
@@ -141,7 +203,7 @@ function SearchResults() {
 
 export default function SearchPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<div className="text-center p-12 text-zinc-500">Loading Search...</div>}>
       <SearchResults />
     </Suspense>
   );
