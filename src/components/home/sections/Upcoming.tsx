@@ -26,7 +26,7 @@ export default function Upcoming({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold">Upcoming Movies</h2>
         <Link
-          href="/movies/upcoming"
+          href="/movie/upcoming"
           className={cn(buttonVariants({ variant: "outline", size: "lg" }), "")}
         >
           View All
@@ -35,7 +35,7 @@ export default function Upcoming({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 justify-center gap-4">
         {initialDatas.results.splice(0, 16).map((data, index) => (
           <Link
-            href={`/movies/${data.id}`}
+            href={`/movie/${data.id}`}
             key={data.id}
             className="flex flex-col p-0 gap-0 bg-transparent ring-0 hover:scale-105 transition-transform duration-200"
           >

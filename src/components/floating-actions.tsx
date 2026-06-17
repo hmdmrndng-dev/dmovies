@@ -1,0 +1,28 @@
+"use client";
+
+import { useState } from "react";
+import { useTheme } from "next-themes"; // Assuming you are using next-themes
+import { Button } from "@/components/ui/button";
+import { IconSun, IconMoon, IconMenu2, IconX } from "@tabler/icons-react";
+
+export function FloatingActions() {
+  const { setTheme, resolvedTheme } = useTheme();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  return (
+    // ✅ FIXED: Keeps the entire button stack locked to the bottom right of the viewport
+    <div className="fixed bottom-8 right-8 z-50 flex flex-col sm:flex-row gap-2 pointer-events-auto">
+      {/* Theme Toggle Button */}
+      <Button
+        variant="outline" // Changed to outline so it pops cleanly off the background page
+        size="lg" // Makes it a perfect clean square
+        className="rounded-full shadow-lg bg-background" // Round pill styling
+        onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      >
+        <IconSun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+        <IconMoon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    </div>
+  );
+}

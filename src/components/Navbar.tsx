@@ -2,22 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  IconChevronDown,
-  IconMenu2,
-  IconMoon,
-  IconSun,
-  IconX,
-} from "@tabler/icons-react";
+import { IconChevronDown, IconMenu2, IconX } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Command } from "./ui/command";
+import { SearchBar } from "./search-bar";
 
 type NavLink = { label: string; href: string };
 type NavItem = { label: string; href?: string; children?: NavLink[] };
@@ -92,18 +82,7 @@ export default function Navbar() {
         </ul>
 
         <div className="ml-auto flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={() =>
-              setTheme(resolvedTheme === "dark" ? "light" : "dark")
-            }
-          >
-            <IconSun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-            <IconMoon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-
+          <SearchBar />
           <Button
             variant="ghost"
             size="lg"

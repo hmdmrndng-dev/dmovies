@@ -24,6 +24,7 @@ import {
 import { cn } from "@/lib/utils";
 import { IconLoader } from "@tabler/icons-react";
 import { pickTrailer, type Video } from "@/lib/video-utils";
+import Link from "next/link";
 
 type Data = {
   id: number;
@@ -213,7 +214,14 @@ export default function Trending({
                         variant="secondary"
                         className="bg-white/10 hover:bg-white/20 border-none backdrop-blur-sm text-white"
                       >
-                        More Info
+                        <Link
+                          href={`/${data.media_type}/${data.id}`}
+                          key={data.id}
+                          className="flex flex-col p-0 gap-0 bg-transparent ring-0 hover:scale-105 transition-transform duration-200"
+                        >
+                          {" "}
+                          More Info
+                        </Link>
                       </Button>
                     </div>
                   </div>
