@@ -24,6 +24,29 @@ export const metadata: Metadata = {
   title: "dmovies-sooty",
   description:
     "I built this app to showcase my skills in working with real-world APIs. It connects to the TMDB API using Axios to fetch live movie data and display it in a clean, responsive layout.",
+
+  authors: [
+    { name: "Hamodi Marandang", url: "https://github.com/hmdmrndng-dev" },
+    { name: "Hamodi Marandang", url: "https://hmdmrndng.vercel.app/" },
+  ],
+  creator: "Hamodi Marandang",
+  publisher: "Hamodi Marandang",
+
+  keywords: [
+    "Portfolio",
+    "Movie App",
+    "TMDB API",
+    "Next.js",
+    "React",
+    "Shadcn UI",
+    "Tailwind CSS",
+    "hmdmrndng"
+  ],
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
