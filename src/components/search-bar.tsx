@@ -20,7 +20,8 @@ export function SearchBar() {
 
   useEffect(() => {
     if (pathname === "/search" && !query.trim()) {
-      router.push("/");
+      router.back();
+      return;
     }
     const delayDebounceFn = setTimeout(() => {
       if (query.trim()) {
