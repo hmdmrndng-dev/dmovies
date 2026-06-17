@@ -1,6 +1,7 @@
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { IconMovie } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -52,18 +53,18 @@ export default function Upcoming({
                 />
               </div>
             ) : (
-              <div className="w-48 h-72 bg-gray-300 rounded-md flex items-center justify-center">
-                🎬
+              <div className="w-full aspect-[10/16] bg-gray-300 rounded-xl flex items-center justify-center text-gray-700 text-sm font-medium select-none shadow-md">
+                <IconMovie />
               </div>
             )}
             <div className="flex flex-col">
-              <h3 className="text-lg font-bold">
-                {data.title.substring(0, 16)}
-                {data.title.length > 16 ? "..." : ""}
-              </h3>
-              <p className="text-xs text-gray-600">
+              <span className="truncate text-sm font-medium">
+                {data.title.substring(0, 32)}
+                {data.title.length > 32 ? "..." : ""}
+              </span>
+              <span className="text-xs text-gray-600 capitalize">
                 {data.release_date || "N/A"}
-              </p>
+              </span>
             </div>
           </Link>
         ))}

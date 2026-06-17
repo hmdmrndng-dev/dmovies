@@ -39,7 +39,6 @@ export default function Navbar() {
   const [open, setOpen] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
-  const { resolvedTheme, setTheme } = useTheme();
 
   const closeMobile = () => {
     setMobileOpen(false);

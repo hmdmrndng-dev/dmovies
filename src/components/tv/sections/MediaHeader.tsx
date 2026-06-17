@@ -16,15 +16,15 @@ type Keyword = {
 
 type MediaHeaderProps = {
   tv: {
-    title: string;
+    name: string;
     tagline?: string;
     overview?: string;
     vote_average?: number;
     adult?: boolean;
     genres?: Genre[];
-    release_date?: string | null;
+    first_air_date?: string | null;
+    last_air_date?: string | null;
     poster_path?: string | null;
-    runtime?: number | null;
     status?: string;
     production_companies?: Array<{ name: string }>;
   };
@@ -41,7 +41,7 @@ type MediaHeaderProps = {
 };
 
 export default function MediaHeader({
-  tv: movie,
+  tv: tv,
   socialLinks,
   onOpenTrailer,
   isTrailerLoading,
@@ -52,10 +52,10 @@ export default function MediaHeader({
       <div className="flex flex-col md:flex-row gap-6 lg:gap-10">
         <div className="flex flex-row md:flex-col gap-4 items-end md:items-stretch shrink-0 md:w-52 lg:w-64">
           <div className="relative w-28 sm:w-36 md:w-full aspect-[2/3] rounded-xl overflow-hidden shadow-2xl ring-1 ring-border bg-zinc-900">
-            {movie.poster_path ? (
+            {tv.poster_path ? (
               <Image
-                src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
-                alt={movie.title || "Poster"}
+                src={`https://image.tmdb.org/t/p/original${tv.poster_path}`}
+                alt={tv.name || "Poster"}
                 fill
                 priority
                 sizes="(max-width: 640px) 112px, (max-width: 768px) 144px, 256px"
@@ -116,74 +116,74 @@ export default function MediaHeader({
               variant="outline"
               className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20 font-semibold"
             >
-              {movie.status || "Unknown Status"}
+              {tv.status || "Unknown Status"}
             </Badge>
             <Badge
               variant="outline"
               className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20 font-semibold"
             >
-              Movie
+              TV Show
             </Badge>
             <Badge
               variant="outline"
               className="flex items-center gap-1 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 font-semibold"
             >
-              TMDB {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
+              TMDB {tv.vote_average ? tv.vote_average.toFixed(1) : "N/A"}
             </Badge>
             <Badge
               variant="outline"
               className={cn(
                 "px-2.5 py-0.5 font-bold tracking-wider uppercase",
-                movie.adult
+                tv.adult
                   ? "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400"
                   : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400",
               )}
             >
-              {movie.adult ? "R-Rated" : "PG-13"}
+              {tv.adult ? "R-Rated" : "PG-13"}
             </Badge>
           </div>
 
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
-            {movie.title}
+            {tv.name}
           </h1>
 
           <div className="flex flex-col gap-1">
             <p className="text-sm text-muted-foreground">
-              {movie.release_date
-                ? new Date(movie.release_date).toLocaleDateString(undefined, {
+              {tv.first_air_date
+                ? new Date(tv.first_air_date).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : "N/A"}
+              {" - "}
+              {tv.last_air_date
+                ? new Date(tv.last_air_date).toLocaleDateString(undefined, {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                   })
                 : "N/A"}
             </p>
-            {movie.tagline && (
+            {tv.tagline && (
               <p className="text-sm italic text-muted-foreground">
-                &ldquo;{movie.tagline}&rdquo;
+                &ldquo;{tv.tagline}&rdquo;
               </p>
             )}
           </div>
 
           <div className="flex flex-wrap gap-2 items-center">
-            {movie.genres?.map((genre) => (
+            {tv.genres?.map((genre) => (
               <Badge key={genre.id} variant="secondary">
                 {genre.name}
               </Badge>
             ))}
-            {movie.runtime ? (
-              <>
-                <span className="text-muted-foreground text-sm mx-1">•</span>
-                <Badge variant="secondary">
-                  {`${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m`}
-                </Badge>
-              </>
-            ) : null}
           </div>
 
           <div>
             <h2 className="font-semibold text-base mb-2">Overview</h2>
             <p className="text-sm leading-relaxed text-justify text-muted-foreground">
-              {movie.overview || "No overview available."}
+              {tv.overview || "No overview available."}
             </p>
           </div>
           <div>
@@ -191,7 +191,7 @@ export default function MediaHeader({
               Production Companies
             </h2>
             <p className="text-sm leading-relaxed text-justify text-muted-foreground">
-              {movie.production_companies
+              {tv.production_companies
                 ?.map((company) => company.name)
                 .join(", ") || "No production companies available."}
             </p>

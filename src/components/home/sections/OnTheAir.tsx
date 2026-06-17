@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { IconMovie } from "@tabler/icons-react";
 
 type Data = {
   id: number;
@@ -50,18 +51,18 @@ export default function OnTheAir({
                 />
               </div>
             ) : (
-              <div className="w-48 h-72 bg-gray-300 rounded-md flex items-center justify-center">
-                🎬
+              <div className="w-full aspect-[10/16] bg-gray-300 rounded-xl flex items-center justify-center text-gray-700 text-sm font-medium select-none shadow-md">
+                <IconMovie />
               </div>
             )}
             <div className="flex flex-col">
-              <h3 className="text-lg font-bold">
-                {data.name.substring(0, 16)}
-                {data.name.length > 16 ? "..." : ""}
-              </h3>
-              <p className="text-xs text-gray-600">
+              <span className="truncate text-sm font-medium">
+                {data.name.substring(0, 32)}
+                {data.name.length > 32 ? "..." : ""}
+              </span>
+              <span className="text-xs text-gray-600 capitalize">
                 {data.first_air_date || "N/A"}
-              </p>
+              </span>
             </div>
           </Link>
         ))}

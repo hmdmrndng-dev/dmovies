@@ -21,23 +21,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import MediaHeader from "@/components/movie/sections/MediaHeader";
 import { cn } from "@/lib/utils";
-import Credits from "@/components/movie/sections/Credits";
-import Similar from "@/components/movie/sections/Similar";
+import MediaHeader from "@/components/tv/sections/MediaHeader";
+import Credits from "@/components/tv/sections/Credits";
+import Similar from "@/components/tv/sections/Similar";
 import { IconLoader, IconMovie, IconMovieOff } from "@tabler/icons-react";
 
-type Movies = {
+type Tvs = {
   id: number;
-  title: string;
+  name: string;
   tagline: string;
   overview: string;
+  poster_path: string | null;
   vote_average: number;
   adult: boolean;
   genres: Genre[];
-  release_date: string | null;
-  poster_path: string | null;
-  runtime: number | null;
+  first_air_date: string | null;
+  last_air_date: string | null;
   status: string;
 };
 
@@ -57,7 +57,7 @@ type ExternalIds = {
   twitter_id: string | null;
 };
 
-type MovieCredits = {
+type TvCredits = {
   cast: Cast[];
   crew: Crew[];
 };
@@ -81,27 +81,27 @@ type Keywords = {
   name: string;
 };
 
-type SimilarMovies = {
+type SimilarTvs = {
   id: number;
-  title: string;
+  name: string;
   poster_path: string | null;
-  release_date: string | null;
+  first_air_date: string | null;
 };
 
 export default function Details({
-  movies,
+  movies: tvs,
   credits,
   images,
   externalIds,
   keywords,
   similar,
 }: {
-  movies: Movies;
-  credits: MovieCredits;
+  movies: Tvs;
+  credits: TvCredits;
   images: TmdbImages;
   externalIds: ExternalIds;
   keywords: Keywords[];
-  similar: SimilarMovies[];
+  similar: SimilarTvs[];
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
@@ -126,13 +126,13 @@ export default function Details({
   const [trailerDescription, setTrailerDescription] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function openTrailer(data: Movies) {
+  async function openTrailer(data: Tvs) {
     setIsDialogOpen(true);
     setLoading(true);
-    setTrailerTitle(data.title);
+    setTrailerTitle(data.name);
     setTrailerDescription(data.overview);
     try {
-      const res = await fetch(`/api/movie/${data.id}/videos`);
+      const res = await fetch(`/api/tv/${data.id}/videos`);
       const json = await res.json();
       setTrailerKey(pickTrailer(json.results as Video[]));
     } finally {
@@ -141,7 +141,7 @@ export default function Details({
   }
 
   const backdropsList = images?.backdrops?.slice(0, 10) || [];
-
+  console.log(keywords);
   return (
     <main className="mt-16">
       <div className="relative">
@@ -159,7 +159,7 @@ export default function Details({
                 {image.file_path ? (
                   <Image
                     src={`https://image.tmdb.org/t/p/w1280${image.file_path}`}
-                    alt={movies.title}
+                    alt={tvs.name}
                     fill
                     priority={index === 0}
                     loading={index === 0 ? undefined : "lazy"}
@@ -167,7 +167,7 @@ export default function Details({
                     className="object-cover pointer-events-none"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                  <div className="w-full aspect-[10/16] bg-gray-300 rounded-xl flex items-center justify-center text-gray-700 text-sm font-medium select-none shadow-md">
                     <IconMovie />
                   </div>
                 )}
@@ -204,10 +204,10 @@ export default function Details({
         )}
       >
         <MediaHeader
-          tv={movies}
+          tv={tvs}
           socialLinks={socialLinks}
           hasMultipleBackdrops={backdropsList.length > 1}
-          onOpenTrailer={() => openTrailer(movies)}
+          onOpenTrailer={() => openTrailer(tvs)}
           isTrailerLoading={loading}
           keywords={keywords}
         />

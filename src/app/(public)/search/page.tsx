@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { IconLoader } from "@tabler/icons-react";
+import { IconArrowDown, IconLoader, IconMovie } from "@tabler/icons-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +24,7 @@ function SearchResults() {
 
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   // 🚨 State hooks to track page locations
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -41,13 +41,15 @@ function SearchResults() {
     async function initializeSearch() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/multi?query=${encodeURIComponent(q)}&page=1`);
+        const res = await fetch(
+          `/api/multi?query=${encodeURIComponent(q)}&page=1`,
+        );
         const data = await res.json();
 
         const filtered = (data.results || []).filter(
           (item: SearchResult) => item.media_type !== "person",
         );
-        
+
         setResults(filtered);
         setPage(1); // Reset back to page 1 for a new search term
         setTotalPages(data.total_pages || 0);
@@ -69,7 +71,9 @@ function SearchResults() {
     setLoading(true);
 
     try {
-      const res = await fetch(`/api/multi?query=${encodeURIComponent(q)}&page=${nextPage}`);
+      const res = await fetch(
+        `/api/multi?query=${encodeURIComponent(q)}&page=${nextPage}`,
+      );
       const data = await res.json();
 
       const filtered = (data.results || []).filter(
@@ -100,7 +104,7 @@ function SearchResults() {
     <main className="w-full gap-4 px-6 py-4 xl:px-24 mt-16 pb-24">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-3xl font-bold">
             Search Results for <span className="text-zinc-400">"{q}"</span>
           </h1>
           <p className="text-zinc-500 mt-2">
@@ -131,11 +135,12 @@ function SearchResults() {
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 justify-center gap-4">
-            {/* 🚨 Looping directly through all items collected across pages */}
             {results.map((data, index) => {
               const displayName = data.title || data.name;
               const targetDate = data.release_date || data.first_air_date;
-              const releaseYear = targetDate ? new Date(targetDate).getFullYear() : "";
+              const releaseYear = targetDate
+                ? new Date(targetDate).getFullYear()
+                : "";
 
               return (
                 <Link
@@ -156,16 +161,16 @@ function SearchResults() {
                       />
                     </div>
                   ) : (
-                    <div className="w-full aspect-[10/16] bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center text-4xl select-none shadow-md">
-                      🎬
+                    <div className="w-full aspect-[10/16] bg-gray-300 rounded-xl flex items-center justify-center text-gray-700 text-sm font-medium select-none shadow-md">
+                      <IconMovie />
                     </div>
                   )}
 
-                  <div className="flex flex-col mt-2 px-1">
-                    <span className="truncate text-sm font-medium text-zinc-200 group-hover:text-white">
+                  <div className="flex flex-col">
+                    <span className="truncate text-sm font-medium">
                       {displayName}
                     </span>
-                    <span className="text-xs text-zinc-500 capitalize">
+                    <span className="text-xs text-gray-600 capitalize">
                       {data.media_type} {releaseYear && `• ${releaseYear}`}
                     </span>
                   </div>
@@ -181,16 +186,16 @@ function SearchResults() {
                 onClick={loadMorePages}
                 disabled={loading}
                 className={cn(
-                  buttonVariants({ variant: "outline", size: "lg" }),
-                  "w-full max-w-xs font-medium border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-200 gap-2"
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                  "w-full max-w-xs",
                 )}
               >
                 {loading ? (
                   <>
-                    <IconLoader className="h-4 w-4 animate-spin" /> Loading...
+                    <IconLoader className="h-4 w-4 animate-spin" />
                   </>
                 ) : (
-                  "Load More Results"
+                  <IconArrowDown className="h-4 w-4" />
                 )}
               </button>
             </div>
@@ -203,7 +208,11 @@ function SearchResults() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="text-center p-12 text-zinc-500">Loading Search...</div>}>
+    <Suspense
+      fallback={
+        <div className="text-center p-12 text-zinc-500">Loading Search...</div>
+      }
+    >
       <SearchResults />
     </Suspense>
   );

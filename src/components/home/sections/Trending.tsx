@@ -22,7 +22,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { IconLoader } from "@tabler/icons-react";
+import { IconLoader, IconMovie, IconMovieOff } from "@tabler/icons-react";
 import { pickTrailer, type Video } from "@/lib/video-utils";
 import Link from "next/link";
 
@@ -56,6 +56,7 @@ export default function Trending({
   initialDatas: TmdbResponse;
   genres: Genre[];
 }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
@@ -78,6 +79,7 @@ export default function Trending({
   const [loading, setLoading] = useState(false);
 
   async function openTrailer(data: Data) {
+    setIsDialogOpen(true);
     setLoading(true);
     setTrailerTitle(data.title || data.name);
     setTrailerDescription(data.overview);
@@ -116,8 +118,8 @@ export default function Trending({
                       className="object-cover pointer-events-none"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
-                      🎬
+                    <div className="w-full aspect-[10/16] bg-gray-300 rounded-xl flex items-center justify-center text-gray-700 text-sm font-medium select-none shadow-md">
+                      <IconMovie />
                     </div>
                   )}
 
@@ -185,9 +187,9 @@ export default function Trending({
                         ))}
                     </div>
 
-                    <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground drop-shadow md:text-lg">
-                      {data.overview.length > 300
-                        ? `${data.overview.substring(0, 300)}...`
+                    <p className="mt-4 max-w-2xl text-justify text-sm leading-relaxed text-muted-foreground drop-shadow md:text-lg">
+                      {data.overview.length > 360
+                        ? `${data.overview.substring(0, 360)}...`
                         : data.overview}
                     </p>
 
@@ -199,7 +201,6 @@ export default function Trending({
                       >
                         {loading ? (
                           <>
-                            Loading
                             <IconLoader
                               data-icon="inline-start"
                               className="ml-2 animate-spin"
@@ -245,10 +246,7 @@ export default function Trending({
         </div>
       </Carousel>
 
-      <Dialog
-        open={trailerKey !== null}
-        onOpenChange={(open) => !open && setTrailerKey(null)}
-      >
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="w-[95vw] md:w-[88vw] lg:w-[80vw] xl:w-[75vw] 2xl:w-[70vw] sm:max-w-[1800px] p-2 sm:p-4 gap-3 border-none bg-zinc-950 text-white">
           <DialogHeader>
             <DialogTitle className="px-2 pt-2 sm:p-0 text-lg sm:text-xl font-bold tracking-tight">
@@ -257,7 +255,7 @@ export default function Trending({
             <DialogDescription>{trailerDescription}</DialogDescription>
           </DialogHeader>
 
-          {trailerKey && (
+          {trailerKey ? (
             <div className="aspect-video w-full overflow-hidden rounded-md bg-black shadow-2xl shadow-black/50">
               <iframe
                 src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
@@ -266,6 +264,16 @@ export default function Trending({
                 allowFullScreen
                 className="h-full w-full border-none"
               />
+            </div>
+          ) : (
+            <div className="flex h-48 items-center justify-center rounded-md bg-black">
+              {loading ? (
+                <>
+                  <IconLoader className="ml-2 animate-spin" />
+                </>
+              ) : (
+                <IconMovieOff className="h-12 w-12 text-muted-foreground" />
+              )}
             </div>
           )}
 

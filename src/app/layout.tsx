@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "dmovies",
+  title: "dmovies-sooty",
   description:
     "I built this app to showcase my skills in working with real-world APIs. It connects to the TMDB API using Axios to fetch live movie data and display it in a clean, responsive layout.",
 };
