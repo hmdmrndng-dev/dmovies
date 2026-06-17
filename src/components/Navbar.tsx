@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { IconChevronDown, IconMenu2, IconX } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
@@ -82,7 +82,7 @@ export default function Navbar() {
         </ul>
 
         <div className="ml-auto flex items-center gap-1">
-          <SearchBar />
+          <Suspense><SearchBar /></Suspense>
           <Button
             variant="ghost"
             size="lg"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { IconLoader } from "@tabler/icons-react";
@@ -16,7 +16,7 @@ type SearchResult = {
   first_air_date?: string;
 };
 
-export default function SearchPage() {
+function SearchResults() {
   const searchParams = useSearchParams();
   const q = searchParams.get("q") || "";
 
@@ -136,5 +136,13 @@ export default function SearchPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense>
+      <SearchResults />
+    </Suspense>
   );
 }
