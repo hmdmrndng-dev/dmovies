@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Footer } from "@/components/Footer";
 import { FloatingActions } from "@/components/floating-actions";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -55,6 +56,7 @@ export default function RootLayout({
           <Footer />
           <FloatingActions />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
