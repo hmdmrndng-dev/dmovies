@@ -158,7 +158,7 @@ export default function Details({
               >
                 {image.file_path ? (
                   <Image
-                    src={`https://image.tmdb.org/t/p/w1280${image.file_path}`}
+                    src={`https://image.tmdb.org/t/p/original${image.file_path}`}
                     alt={movies.title}
                     fill
                     priority={index === 0}

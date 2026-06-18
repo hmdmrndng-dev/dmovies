@@ -109,7 +109,7 @@ export default function Trending({
                 <CardContent className="relative h-full w-full">
                   {data.backdrop_path ? (
                     <Image
-                      src={`https://image.tmdb.org/t/p/w1280${data.backdrop_path}`}
+                      src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
                       alt={data.title || data.name}
                       fill
                       priority={index === 0}
