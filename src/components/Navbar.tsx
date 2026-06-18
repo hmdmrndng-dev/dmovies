@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Command } from "./ui/command";
-import { SearchBar } from "./search-bar";
+import { SearchBar } from "../app/shared/search-bar";
 
 type NavLink = { label: string; href: string };
 type NavItem = { label: string; href?: string; children?: NavLink[] };
@@ -16,10 +16,10 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: "Movies",
     children: [
-      { label: "Popular", href: "/movies/popular" },
-      { label: "Now Playing", href: "/movies/now-playing" },
-      { label: "Upcoming", href: "/movies/upcoming" },
-      { label: "Top Rated", href: "/movies/top-rated" },
+      { label: "Popular", href: "/movie/popular" },
+      { label: "Now Playing", href: "/movie/now-playing" },
+      { label: "Upcoming", href: "/movie/upcoming" },
+      { label: "Top Rated", href: "/movie/top-rated" },
     ],
   },
   {
@@ -47,7 +47,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <nav className="flex w-full items-center px-6 py-3 md:px-24 md:py-4">
+      <nav className="flex w-full items-center px-6 py-3 md:px-24 md:py-4 justify-between">
         <Link
           href="/"
           className="text-lg font-bold tracking-tight text-primary"
@@ -57,7 +57,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <ul className="ml-auto hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-1 md:flex">
           {NAV_ITEMS.map((data) =>
             data.children ? (
               <DropdownItem
@@ -80,7 +80,7 @@ export default function Navbar() {
           )}
         </ul>
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="flex gap-1">
           <Suspense>
             <SearchBar />
           </Suspense>
