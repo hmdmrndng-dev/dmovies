@@ -61,7 +61,6 @@ export default function SearchPage() {
     initializeSearch();
   }, [q]);
 
-  // 🚨 Function handler to fetch subsequent pages and append them
   async function loadMorePages() {
     if (loading || page >= totalPages) return;
 
@@ -78,7 +77,6 @@ export default function SearchPage() {
         (item: SearchResult) => item.media_type !== "person",
       );
 
-      // Append new items to your existing cards seamlessly
       setResults((prev) => [...prev, ...filtered]);
       setPage(nextPage);
     } catch (error) {
@@ -149,7 +147,7 @@ export default function SearchPage() {
                   {data.poster_path ? (
                     <div className="relative w-full aspect-[10/16] overflow-hidden rounded-xl">
                       <Image
-                        src={`https://image.tmdb.org/t/p/w500${data.poster_path}`}
+                        src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
                         alt={displayName || "Poster"}
                         fill
                         priority={index < 4}

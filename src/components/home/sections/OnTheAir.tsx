@@ -43,7 +43,7 @@ export default function OnTheAir({
             {data.poster_path ? (
               <div className="relative w-full aspect-[10/16] overflow-hidden rounded-xl">
                 <Image
-                  src={`https://image.tmdb.org/t/p/w500${data.poster_path}`}
+                  src={`https://image.tmdb.org/t/p/original${data.poster_path}`}
                   alt={data.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"

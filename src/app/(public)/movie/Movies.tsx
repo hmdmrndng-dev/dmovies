@@ -68,7 +68,7 @@ export default function Movies({
                 {movie.poster_path ? (
                   <div className="relative w-full aspect-[10/16] overflow-hidden rounded-xl">
                     <Image
-                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                      src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
                       alt={displayName || "Poster"}
                       fill
                       priority={index < 4}

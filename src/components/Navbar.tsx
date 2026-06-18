@@ -31,7 +31,7 @@ const NAV_ITEMS: NavItem[] = [
       { label: "Top Rated", href: "/tv/top-rated" },
     ],
   },
-  { label: "People", href: "/people" },
+  { label: "People", href: "/person" },
   { label: "About", href: "/about" },
 ];
 

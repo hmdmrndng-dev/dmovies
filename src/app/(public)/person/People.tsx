@@ -6,21 +6,26 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-type Tvs = {
+type People = {
   id: number;
   name: string;
-  first_air_date: string | null;
-  poster_path: string | null;
+  gender: number;
+  profile_path: string | null;
 };
-interface TvsProps {
+interface PeopleProps {
   headers: string;
-  data: Tvs[];
+  data: People[];
   totalPages: number;
   endpoint: string;
 }
 
-export default function Tvs({ headers, data, totalPages, endpoint }: TvsProps) {
-  const [tvs, setMovies] = useState<Tvs[]>(data);
+export default function People({
+  headers,
+  data,
+  totalPages,
+  endpoint,
+}: PeopleProps) {
+  const [people, setPeople] = useState<People[]>(data);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -34,10 +39,10 @@ export default function Tvs({ headers, data, totalPages, endpoint }: TvsProps) {
       const res = await fetch(`${endpoint}?page=${nextPage}`);
       const data = await res.json();
 
-      setMovies((prev) => [...prev, ...(data.results || [])]);
+      setPeople((prev) => [...prev, ...(data.results || [])]);
       setPage(nextPage);
     } catch (error) {
-      console.error("Error loading more tvs:", error);
+      console.error("Error loading more people:", error);
     } finally {
       setLoading(false);
     }
@@ -47,24 +52,21 @@ export default function Tvs({ headers, data, totalPages, endpoint }: TvsProps) {
       <div className="mb-8 flex flex-col gap-4">
         <h1 className="text-3xl font-bold">{headers}</h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 justify-center gap-4">
-          {tvs.map((tv, index) => {
-            const displayName = tv.name;
-            const targetDate = tv.first_air_date;
-            const releaseYear = targetDate
-              ? new Date(targetDate).getFullYear()
-              : "";
+          {people.map((person, index) => {
+            const displayName = person.name;
+            const gender = person.gender;
 
             return (
               <Link
-                key={`tv-${tv.id}-${index}`}
-                href={`/tv/${tv.id}`}
+                key={`person-${person.id}-${index}`}
+                href={`/person/${person.id}`}
                 className="flex flex-col p-0 gap-0 bg-transparent ring-0 hover:scale-105 transition-transform duration-200 group"
               >
-                {tv.poster_path ? (
+                {person.profile_path ? (
                   <div className="relative w-full aspect-[10/16] overflow-hidden rounded-xl">
                     <Image
-                      src={`https://image.tmdb.org/t/p/original${tv.poster_path}`}
-                      alt={displayName || "Poster"}
+                      src={`https://image.tmdb.org/t/p/original${person.profile_path}`}
+                      alt={displayName || "Profile Image"}
                       fill
                       priority={index < 4}
                       loading={index < 4 ? undefined : "lazy"}
@@ -83,7 +85,7 @@ export default function Tvs({ headers, data, totalPages, endpoint }: TvsProps) {
                     {displayName}
                   </span>
                   <span className="text-xs text-gray-600 capitalize">
-                    Movie {releaseYear && `• ${releaseYear}`}
+                    {gender === 1 ? "Female" : gender === 2 ? "Male" : "N/A"}
                   </span>
                 </div>
               </Link>
