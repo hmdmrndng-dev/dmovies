@@ -40,7 +40,7 @@ export default function Credits({ title, cast, crew }: CreditsProps) {
 
           return (
             <Link
-              href={`/people/${data.id}`}
+              href={`/person/${data.id}`}
               key={`${data.id}-${index}`}
               className="flex flex-col p-0 gap-0 bg-transparent ring-0 hover:scale-105 transition-transform duration-200"
             >
