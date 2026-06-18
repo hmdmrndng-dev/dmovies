@@ -10,6 +10,7 @@ type People = {
   id: number;
   name: string;
   gender: number;
+  known_for_department: string;
   profile_path: string | null;
 };
 interface PeopleProps {
@@ -85,6 +86,7 @@ export default function People({
                     {displayName}
                   </span>
                   <span className="text-xs text-gray-600 capitalize">
+                    {person.known_for_department} •{" "}
                     {gender === 1 ? "Female" : gender === 2 ? "Male" : "N/A"}
                   </span>
                 </div>

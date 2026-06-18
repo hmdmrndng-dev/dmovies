@@ -12,6 +12,8 @@ import Autoplay from "embla-carousel-autoplay";
 import { cn } from "@/lib/utils";
 import { IconMovie } from "@tabler/icons-react";
 import MediaHeader from "@/components/people/sections/MediaHeader";
+import { getSocialLinks } from "@/lib/social-utils";
+import MoviesKnownFor from "@/components/people/sections/MoviesKnownFor";
 
 type Person = {
   id: number;
@@ -25,19 +27,51 @@ type Person = {
   known_for_department?: string | null;
 };
 
-type TmdbImages = {
-  backdrops: Array<{ backdrop_path: string }>;
+type Cast = {
+  id: number;
+  title: string;
+  character: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  popularity: number;
+};
+
+type Crew = {
+  id: number;
+  job: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  popularity: number;
+};
+
+type CombinedCredits = {
+  cast: Cast[];
+  crew: Crew[];
+};
+
+type ExternalIds = {
+  imdb_id: string | null;
+  facebook_id: string | null;
+  instagram_id: string | null;
+  twitter_id: string | null;
+  youtube_id: string | null;
+  wikidata_id: string | null;
+  tik_tok_id: string | null;
 };
 
 export default function Details({
   person,
-  images,
+  credits,
+  externalIds,
 }: {
   person: Person;
-  images: TmdbImages;
+  credits: CombinedCredits;
+  externalIds: ExternalIds;
 }) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+
+  const socialLinks = getSocialLinks(externalIds);
 
   const autoplayPlugin = useRef(
     Autoplay({
@@ -52,7 +86,23 @@ export default function Details({
     api.on("select", () => setCurrent(api.selectedScrollSnap()));
   }, [api]);
 
-  const backdropsList = images?.backdrops || [];
+  const combinedMedia = [
+    ...(credits?.cast || []),
+    ...(credits?.crew || []),
+  ].sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+
+  const knownForList = combinedMedia;
+
+  const castPaths = credits?.cast?.map((c) => c.backdrop_path) || [];
+  const crewPaths = credits?.crew?.map((c) => c.backdrop_path) || [];
+  const combinedPaths = [...castPaths, ...crewPaths];
+
+  const backdropsList = Array.from(new Set(combinedPaths))
+    .filter((path): path is string => !!path)
+    .slice(0, 10)
+    .map((path) => ({
+      backdrop_path: path,
+    }));
 
   return (
     <main className="mt-16">
@@ -115,7 +165,12 @@ export default function Details({
           backdropsList.length > 1 ? "-mt-16 md:-mt-24" : "mt-4",
         )}
       >
-        <MediaHeader person={person} hasMultipleBackdrops={backdropsList.length > 1} />
+        <MediaHeader
+          person={person}
+          hasMultipleBackdrops={backdropsList.length > 1}
+          socialLinks={socialLinks}
+        />
+        <MoviesKnownFor movies={knownForList} />
       </div>
     </main>
   );

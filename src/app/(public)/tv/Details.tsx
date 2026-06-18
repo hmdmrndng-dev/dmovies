@@ -55,6 +55,9 @@ type ExternalIds = {
   facebook_id: string | null;
   instagram_id: string | null;
   twitter_id: string | null;
+  youtube_id: string | null;
+  wikidata_id: string | null;
+  tik_tok_id: string | null;
 };
 
 type TvCredits = {

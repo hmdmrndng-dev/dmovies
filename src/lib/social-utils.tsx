@@ -1,8 +1,10 @@
 import {
   IconBrandFacebook,
   IconBrandInstagram,
+  IconBrandTiktok,
   IconBrandTwitter,
   IconBrandWikipedia,
+  IconBrandYoutube,
 } from "@tabler/icons-react";
 
 // We define a lightweight type for the TMDB external IDs payload
@@ -12,6 +14,8 @@ type ExternalIds = {
   instagram_id?: string | null;
   twitter_id?: string | null;
   wikidata_id?: string | null;
+  tik_tok_id?: string | null;
+  youtube_id?: string | null;
 };
 
 // ✅ We export a function instead of a raw array
@@ -50,6 +54,18 @@ export function getSocialLinks(externalIds: ExternalIds) {
       url: `https://www.wikidata.org/wiki/${externalIds?.wikidata_id}`,
       icon: <IconBrandWikipedia className="h-5 w-5" />,
       label: "Wiki",
+    },
+    {
+      id: externalIds?.tik_tok_id,
+      url: `https://www.tiktok.com/@${externalIds?.tik_tok_id}`,
+      icon: <IconBrandTiktok className="h-5 w-5" />,
+      label: "TikTok",
+    },
+    {
+      id: externalIds?.youtube_id,
+      url: `https://www.youtube.com/@${externalIds?.youtube_id}`,
+      icon: <IconBrandYoutube className="h-5 w-5" />,
+      label: "YouTube",
     },
   ];
 }
