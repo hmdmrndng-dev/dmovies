@@ -14,18 +14,19 @@ export async function POST(request: Request) {
       );
     }
 
-    const { account_id, media_id, media_type, favorite } = await request.json();
+    const { account_id, media_id, media_type, watchlist } =
+      await request.json();
 
     const res = await tmdb.post(
-      `https://api.themoviedb.org/3/account/${account_id}/favorite?session_id=${sessionId}`,
-      { media_type, media_id, favorite },
+      `https://api.themoviedb.org/3/account/${account_id}/watchlist?session_id=${sessionId}`,
+      { media_type, media_id, watchlist },
     );
 
     return NextResponse.json(res.data);
   } catch (error: any) {
     const status = error.response?.status || 500;
     const message =
-      error.response?.data?.status_message || "Failed to update favorite";
+      error.response?.data?.status_message || "Failed to update watchlist";
     return NextResponse.json({ message }, { status });
   }
 }

@@ -45,6 +45,12 @@ type MediaHeaderProps = {
   isTrailerLoading: boolean;
   keywords: Keyword[];
   user: any | null;
+  isFavorited: boolean;
+  onFavorite: () => void;
+  isFavoriteLoading: boolean;
+  isInWatchlist: boolean;
+  onWatchlist: () => void;
+  isWatchlistLoading: boolean;
 };
 
 export default function MediaHeader({
@@ -55,6 +61,12 @@ export default function MediaHeader({
   isTrailerLoading,
   keywords,
   user,
+  isFavorited,
+  onFavorite,
+  isFavoriteLoading,
+  isInWatchlist,
+  onWatchlist,
+  isWatchlistLoading,
 }: MediaHeaderProps) {
   return (
     <section>
@@ -213,24 +225,42 @@ export default function MediaHeader({
               <Button
                 variant="ghost"
                 className="w-12 h-12"
-                onClick={user ? undefined : onOpenLogin}
+                onClick={onFavorite}
+                disabled={isFavoriteLoading}
+                title={
+                  isFavorited ? "Remove from favorites" : "Add to favorites"
+                }
               >
-                <IconHeart className="!w-8 !h-8" />
+                <IconHeart
+                  className={cn(
+                    "!w-8 !h-8",
+                    isFavorited && "fill-red-500 text-red-500",
+                  )}
+                />
               </Button>
               <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
-                Add to favorites
+                {isFavorited ? "Liked" : "Add to favorites"}
               </span>
             </div>
             <div className="flex flex-col items-center gap-1.5">
               <Button
                 variant="ghost"
                 className="w-12 h-12"
-                onClick={user ? undefined : onOpenLogin}
+                onClick={onWatchlist}
+                disabled={isWatchlistLoading}
+                title={
+                  isInWatchlist ? "Remove from watchlist" : "Add to watchlist"
+                }
               >
-                <IconBookmark className="!w-8 !h-8" />
+                <IconBookmark
+                  className={cn(
+                    "!w-8 !h-8",
+                    isInWatchlist && "fill-blue-500 text-blue-500",
+                  )}
+                />
               </Button>
               <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
-                Add to watchlist
+                {isInWatchlist ? "In watchlist" : "Add to watchlist"}
               </span>
             </div>
           </div>

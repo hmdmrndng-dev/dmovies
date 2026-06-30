@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Carousel,
   CarouselApi,
@@ -18,6 +19,7 @@ import Similar from "@/components/movie/sections/Similar";
 import { IconMovie } from "@tabler/icons-react";
 import Trailer from "@/app/shared/trailer-dialog";
 import LoginDialog from "@/app/shared/login-dialog";
+import { useMediaAction } from "@/hooks/useMediaAction";
 
 type Movies = {
   id: number;
@@ -91,6 +93,8 @@ export default function Details({
   keywords,
   similar,
   user,
+  isFavorited: initialFavorited,
+  isInWatchlist: initialInWatchlist,
 }: {
   movies: Movies;
   credits: MovieCredits;
@@ -99,13 +103,40 @@ export default function Details({
   keywords: Keywords[];
   similar: SimilarMovies[];
   user: any | null;
+  isFavorited: boolean;
+  isInWatchlist: boolean;
 }) {
+  const router = useRouter();
   const [activeModal, setActiveModal] = useState<"trailer" | "login" | null>(
     null,
   );
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const socialLinks = getSocialLinks(externalIds);
+  const {
+    isActive: favorited,
+    isLoading: favoriteLoading,
+    toggle: toggleFavorite,
+  } = useMediaAction({
+    initialState: initialFavorited,
+    user,
+    mediaId: movies.id,
+    mediaType: "movie",
+    actionType: "favorite",
+    onRequireLogin: openLogin,
+  });
+  const {
+    isActive: inWatchlist,
+    isLoading: watchlistLoading,
+    toggle: toggleWatchlist,
+  } = useMediaAction({
+    initialState: initialInWatchlist,
+    user,
+    mediaId: movies.id,
+    mediaType: "movie",
+    actionType: "watchlist",
+    onRequireLogin: openLogin,
+  });
 
   const autoplayPlugin = useRef(
     Autoplay({
@@ -215,6 +246,12 @@ export default function Details({
           isTrailerLoading={loading}
           keywords={keywords}
           user={user}
+          isFavorited={favorited}
+          onFavorite={toggleFavorite}
+          isFavoriteLoading={favoriteLoading}
+          isInWatchlist={inWatchlist}
+          onWatchlist={toggleWatchlist}
+          isWatchlistLoading={watchlistLoading}
         />
         <Credits cast={credits.cast} />
 
@@ -235,6 +272,9 @@ export default function Details({
       <LoginDialog
         isOpen={activeModal === "login"}
         onOpenChange={(open) => setActiveModal(open ? "login" : null)}
+        onSuccess={() => {
+          router.refresh();
+        }}
       />
     </main>
   );

@@ -14,6 +14,14 @@ export default async function Page({ params }: { params: { id: string } }) {
         .catch(() => null)
     : Promise.resolve(null);
 
+  const accountStatesPromise = sessionId
+    ? tmdb
+        .get(
+          `https://api.themoviedb.org/3/movie/${id}/account_states?session_id=${sessionId}`,
+        )
+        .catch(() => null)
+    : Promise.resolve(null);
+
   const [
     setMovies,
     setCredits,
@@ -22,6 +30,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     setKeywords,
     setSimilar,
     accountRes,
+    accountStatesRes,
   ] = await Promise.all([
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}?language=en-US`),
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}/credits?language=en-US`),
@@ -30,6 +39,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}/keywords`),
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}/similar`),
     accountPromise,
+    accountStatesPromise,
   ]);
   const getMovies = setMovies.data;
   const getCredits = setCredits.data;
@@ -38,6 +48,8 @@ export default async function Page({ params }: { params: { id: string } }) {
   const getKeywords = setKeywords.data.keywords || [];
   const getSimilar = setSimilar.data.results || [];
   const user = accountRes?.data || null;
+  const isFavorited: boolean = accountStatesRes?.data?.favorite ?? false;
+  const isWatchlisted: boolean = accountStatesRes?.data?.watchlist ?? false;
 
   return (
     <Details
@@ -48,6 +60,8 @@ export default async function Page({ params }: { params: { id: string } }) {
       keywords={getKeywords}
       similar={getSimilar}
       user={user}
+      isFavorited={isFavorited}
+      isInWatchlist={isWatchlisted}
     />
   );
 }

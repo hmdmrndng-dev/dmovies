@@ -75,7 +75,6 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
           isOpen={isLoginOpen}
           onOpenChange={setIsLoginOpen}
           onSuccess={() => {
-            // 🎯 Trigger success toast on login
             toast.success("Welcome back!", {
               description: "You have successfully logged in.",
             });
@@ -86,7 +85,6 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
     );
   }
 
-  // 🎯 AUTHENTICATED STATE (Matches closed SearchBar shape)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
