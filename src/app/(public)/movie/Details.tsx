@@ -20,6 +20,7 @@ import { IconMovie } from "@tabler/icons-react";
 import Trailer from "@/app/shared/trailer-dialog";
 import LoginDialog from "@/app/shared/login-dialog";
 import { useMediaAction } from "@/hooks/useMediaAction";
+import { toast } from "sonner";
 
 type Movies = {
   id: number;
@@ -273,6 +274,9 @@ export default function Details({
         isOpen={activeModal === "login"}
         onOpenChange={(open) => setActiveModal(open ? "login" : null)}
         onSuccess={() => {
+          toast.success("Welcome back!", {
+            description: "You have successfully logged in.",
+          });
           router.refresh();
         }}
       />

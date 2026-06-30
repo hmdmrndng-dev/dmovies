@@ -1,7 +1,13 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { IconLoader } from "@tabler/icons-react";
+import {
+  IconBookmark,
+  IconHeart,
+  IconHeartFilled,
+  IconLoader,
+  IconStar,
+} from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 type Genre = {
@@ -36,16 +42,32 @@ type MediaHeaderProps = {
   }>;
   hasMultipleBackdrops: boolean;
   onOpenTrailer: () => void;
+  onOpenLogin: () => void;
   isTrailerLoading: boolean;
   keywords: Keyword[];
+  user: any | null;
+  isFavorited: boolean;
+  onFavorite: () => void;
+  isFavoriteLoading: boolean;
+  isInWatchlist: boolean;
+  onWatchlist: () => void;
+  isWatchlistLoading: boolean;
 };
 
 export default function MediaHeader({
   tv: tv,
   socialLinks,
   onOpenTrailer,
+  onOpenLogin,
   isTrailerLoading,
   keywords,
+  user,
+  isFavorited,
+  onFavorite,
+  isFavoriteLoading,
+  isInWatchlist,
+  onWatchlist,
+  isWatchlistLoading,
 }: MediaHeaderProps) {
   return (
     <section>
@@ -178,6 +200,74 @@ export default function MediaHeader({
                 {genre.name}
               </Badge>
             ))}
+          </div>
+
+          <div className="flex gap-2 flex-wrap items-center">
+            <div className="flex flex-col items-center gap-1.5">
+              <Badge
+                variant="outline"
+                className="w-12 h-12 flex items-center justify-center text-lg font-bold hover:scale-120 transition-transform duration-200 cursor-default"
+              >
+                {tv.vote_average ? tv.vote_average.toFixed(1) : "N/A"}
+              </Badge>
+
+              <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
+                TMDB Rating
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <Button
+                variant="ghost"
+                className="w-12 h-12"
+                onClick={user ? undefined : onOpenLogin}
+              >
+                <IconStar className="!w-8 !h-8" />
+              </Button>
+
+              <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
+                What's your rating?
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <Button
+                variant="ghost"
+                className="w-12 h-12"
+                onClick={onFavorite}
+                disabled={isFavoriteLoading}
+                title={
+                  isFavorited ? "Remove from favorites" : "Add to favorites"
+                }
+              >
+                {isFavorited ? (
+                  <IconHeartFilled className="!w-8 !h-8 fill-red-500 text-red-500" />
+                ) : (
+                  <IconHeart className="!w-8 !h-8" />
+                )}
+              </Button>
+              <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
+                {isFavorited ? "Liked" : "Add to favorites"}
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <Button
+                variant="ghost"
+                className="w-12 h-12"
+                onClick={onWatchlist}
+                disabled={isWatchlistLoading}
+                title={
+                  isInWatchlist ? "Remove from watchlist" : "Add to watchlist"
+                }
+              >
+                {isInWatchlist ? (
+                  <IconBookmark className="!w-8 !h-8 fill-blue-500 text-blue-500" />
+                ) : (
+                  <IconBookmark className="!w-8 !h-8" />
+                )}
+              </Button>
+              <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
+                {isInWatchlist ? "In watchlist" : "Add to watchlist"}
+              </span>
+            </div>
           </div>
 
           <div>

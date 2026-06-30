@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   IconBookmark,
   IconHeart,
+  IconHeartFilled,
   IconLoader,
   IconStar,
 } from "@tabler/icons-react";
@@ -231,12 +232,11 @@ export default function MediaHeader({
                   isFavorited ? "Remove from favorites" : "Add to favorites"
                 }
               >
-                <IconHeart
-                  className={cn(
-                    "!w-8 !h-8",
-                    isFavorited && "fill-red-500 text-red-500",
-                  )}
-                />
+                {isFavorited ? (
+                  <IconHeartFilled className="!w-8 !h-8 fill-red-500 text-red-500" />
+                ) : (
+                  <IconHeart className="!w-8 !h-8" />
+                )}
               </Button>
               <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
                 {isFavorited ? "Liked" : "Add to favorites"}
@@ -252,12 +252,11 @@ export default function MediaHeader({
                   isInWatchlist ? "Remove from watchlist" : "Add to watchlist"
                 }
               >
-                <IconBookmark
-                  className={cn(
-                    "!w-8 !h-8",
-                    isInWatchlist && "fill-blue-500 text-blue-500",
-                  )}
-                />
+                {isInWatchlist ? (
+                  <IconBookmark className="!w-8 !h-8 fill-blue-500 text-blue-500" />
+                ) : (
+                  <IconBookmark className="!w-8 !h-8" />
+                )}
               </Button>
               <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
                 {isInWatchlist ? "In watchlist" : "Add to watchlist"}

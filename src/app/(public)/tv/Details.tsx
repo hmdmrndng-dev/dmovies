@@ -17,6 +17,10 @@ import Credits from "@/components/tv/sections/Credits";
 import Similar from "@/components/tv/sections/Similar";
 import { IconMovie } from "@tabler/icons-react";
 import Trailer from "@/app/shared/trailer-dialog";
+import { useRouter } from "next/navigation";
+import LoginDialog from "@/app/shared/login-dialog";
+import { useMediaAction } from "@/hooks/useMediaAction";
+import { toast } from "sonner";
 
 type Tvs = {
   id: number;
@@ -83,24 +87,57 @@ type SimilarTvs = {
 };
 
 export default function Details({
-  movies: tvs,
+  tvs,
   credits,
   images,
   externalIds,
   keywords,
   similar,
+  user,
+  isFavorited: initialFavorited,
+  isInWatchlist: initialInWatchlist,
 }: {
-  movies: Tvs;
+  tvs: Tvs;
   credits: TvCredits;
   images: TmdbImages;
   externalIds: ExternalIds;
   keywords: Keywords[];
   similar: SimilarTvs[];
+  user: any | null;
+  isFavorited: boolean;
+  isInWatchlist: boolean;
 }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
+  const [activeModal, setActiveModal] = useState<"trailer" | "login" | null>(
+    null,
+  );
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const socialLinks = getSocialLinks(externalIds);
+  const {
+    isActive: favorited,
+    isLoading: favoriteLoading,
+    toggle: toggleFavorite,
+  } = useMediaAction({
+    initialState: initialFavorited,
+    user,
+    mediaId: tvs.id,
+    mediaType: "tv",
+    actionType: "favorite",
+    onRequireLogin: openLogin,
+  });
+  const {
+    isActive: inWatchlist,
+    isLoading: watchlistLoading,
+    toggle: toggleWatchlist,
+  } = useMediaAction({
+    initialState: initialInWatchlist,
+    user,
+    mediaId: tvs.id,
+    mediaType: "tv",
+    actionType: "watchlist",
+    onRequireLogin: openLogin,
+  });
 
   const autoplayPlugin = useRef(
     Autoplay({
@@ -121,7 +158,7 @@ export default function Details({
   const [loading, setLoading] = useState(false);
 
   async function openTrailer(data: Tvs) {
-    setIsDialogOpen(true);
+    setActiveModal("trailer");
     setLoading(true);
     setTrailerTitle(data.name);
     setTrailerDescription(data.overview);
@@ -132,6 +169,10 @@ export default function Details({
     } finally {
       setLoading(false);
     }
+  }
+
+  async function openLogin() {
+    setActiveModal("login");
   }
 
   const backdropsList = images?.backdrops?.slice(0, 10) || [];
@@ -201,8 +242,16 @@ export default function Details({
           socialLinks={socialLinks}
           hasMultipleBackdrops={backdropsList.length > 1}
           onOpenTrailer={() => openTrailer(tvs)}
+          onOpenLogin={openLogin}
           isTrailerLoading={loading}
           keywords={keywords}
+          user={user}
+          isFavorited={favorited}
+          onFavorite={toggleFavorite}
+          isFavoriteLoading={favoriteLoading}
+          isInWatchlist={inWatchlist}
+          onWatchlist={toggleWatchlist}
+          isWatchlistLoading={watchlistLoading}
         />
         <Credits cast={credits.cast} />
 
@@ -212,12 +261,23 @@ export default function Details({
       </div>
 
       <Trailer
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        isOpen={activeModal === "trailer"}
+        onOpenChange={(open) => setActiveModal(open ? "trailer" : null)}
         trailerKey={trailerKey}
         trailerTitle={trailerTitle}
         trailerDescription={trailerDescription}
         loading={trailerKey === null && loading}
+      />
+
+      <LoginDialog
+        isOpen={activeModal === "login"}
+        onOpenChange={(open) => setActiveModal(open ? "login" : null)}
+        onSuccess={() => {
+          toast.success("Welcome back!", {
+            description: "You have successfully logged in.",
+          });
+          router.refresh();
+        }}
       />
     </main>
   );

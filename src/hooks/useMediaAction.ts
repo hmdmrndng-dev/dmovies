@@ -19,7 +19,6 @@ export function useMediaAction({
   const [isActive, setIsActive] = useState(initialState);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Sync state if Next.js router.refresh() fetches new data
   useEffect(() => {
     setIsActive(initialState);
   }, [initialState]);
@@ -32,7 +31,7 @@ export function useMediaAction({
 
     setIsLoading(true);
     const nextState = !isActive;
-    setIsActive(nextState); // Optimistic UI update
+    setIsActive(nextState); 
 
     try {
       await toggleMediaState(
