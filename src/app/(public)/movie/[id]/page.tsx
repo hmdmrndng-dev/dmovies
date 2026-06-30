@@ -1,8 +1,19 @@
+import { cookies } from "next/headers";
 import { tmdb } from "@/lib/tmdb";
 import Details from "../Details";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const { id } = await params;
+
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get("tmdb_session_id")?.value || null;
+
+  const accountPromise = sessionId
+    ? tmdb
+        .get(`https://api.themoviedb.org/3/account?session_id=${sessionId}`)
+        .catch(() => null)
+    : Promise.resolve(null);
+
   const [
     setMovies,
     setCredits,
@@ -10,6 +21,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     setExternalIds,
     setKeywords,
     setSimilar,
+    accountRes,
   ] = await Promise.all([
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}?language=en-US`),
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}/credits?language=en-US`),
@@ -17,6 +29,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}/external_ids`),
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}/keywords`),
     tmdb.get(`https://api.themoviedb.org/3/movie/${id}/similar`),
+    accountPromise,
   ]);
   const getMovies = setMovies.data;
   const getCredits = setCredits.data;
@@ -24,6 +37,8 @@ export default async function Page({ params }: { params: { id: string } }) {
   const getExternalIds = setExternalIds.data;
   const getKeywords = setKeywords.data.keywords || [];
   const getSimilar = setSimilar.data.results || [];
+  const user = accountRes?.data || null;
+
   return (
     <Details
       movies={getMovies}
@@ -32,6 +47,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       externalIds={getExternalIds}
       keywords={getKeywords}
       similar={getSimilar}
+      user={user}
     />
   );
 }

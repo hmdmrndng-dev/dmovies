@@ -10,22 +10,13 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { pickTrailer, type Video } from "@/lib/video-utils";
-import { Button } from "@/components/ui/button";
 import { getSocialLinks } from "@/lib/social-utils";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import MediaHeader from "@/components/tv/sections/MediaHeader";
 import Credits from "@/components/tv/sections/Credits";
 import Similar from "@/components/tv/sections/Similar";
-import { IconLoader, IconMovie, IconMovieOff } from "@tabler/icons-react";
+import { IconMovie } from "@tabler/icons-react";
+import Trailer from "@/app/shared/trailer-dialog";
 
 type Tvs = {
   id: number;
@@ -144,7 +135,6 @@ export default function Details({
   }
 
   const backdropsList = images?.backdrops?.slice(0, 10) || [];
-  console.log(keywords);
   return (
     <main className="mt-16">
       <div className="relative">
@@ -221,47 +211,14 @@ export default function Details({
         <Similar similar={similar} />
       </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[95vw] md:w-[88vw] lg:w-[80vw] xl:w-[75vw] sm:max-w-[1800px] p-2 sm:p-4 gap-3 border-none bg-zinc-950 text-white">
-          <DialogHeader>
-            <DialogTitle className="px-2 pt-2 sm:p-0 text-lg sm:text-xl font-bold tracking-tight">
-              {trailerTitle}
-            </DialogTitle>
-            <DialogDescription>{trailerDescription}</DialogDescription>
-          </DialogHeader>
-          {trailerKey ? (
-            <div className="aspect-video w-full overflow-hidden rounded-md bg-black shadow-2xl shadow-black/50">
-              <iframe
-                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
-                title={`${trailerTitle} Trailer`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="h-full w-full border-none"
-              />
-            </div>
-          ) : (
-            <div className="flex h-48 items-center justify-center rounded-md bg-black">
-              {loading ? (
-                <>
-                  <IconLoader className="ml-2 animate-spin" />
-                </>
-              ) : (
-                <IconMovieOff className="h-12 w-12 text-muted-foreground" />
-              )}
-            </div>
-          )}
-          <DialogFooter className="px-2 pb-2 sm:p-0">
-            <DialogClose asChild>
-              <Button
-                variant="secondary"
-                className="w-full sm:w-auto font-medium"
-              >
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Trailer
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        trailerKey={trailerKey}
+        trailerTitle={trailerTitle}
+        trailerDescription={trailerDescription}
+        loading={trailerKey === null && loading}
+      />
     </main>
   );
 }

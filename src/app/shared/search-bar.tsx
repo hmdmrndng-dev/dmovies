@@ -90,7 +90,7 @@ export function SearchBar() {
           <Button
             onClick={handleClear}
             variant="ghost"
-            className="pointer-events-auto text-muted-foreground hover:text-foreground transition-colors"
+            className="pointer-events-auto text-muted-foreground hover:bg-transparent transition-colors"
             aria-label="Clear search"
           >
             <IconX className="size-3.5" />
@@ -104,7 +104,7 @@ export function SearchBar() {
             className={cn(
               "text-muted-foreground transition-colors duration-200 size-3.5",
               !isOpen
-                ? "pointer-events-auto hover:text-foreground cursor-pointer"
+                ? "pointer-events-auto hover:bg-transparent cursor-pointer"
                 : "pointer-events-none",
             )}
             aria-label="Open search"

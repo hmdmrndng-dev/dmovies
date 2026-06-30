@@ -7,6 +7,7 @@ import Image from "next/image";
 import { IconArrowDown, IconLoader, IconMovie } from "@tabler/icons-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type SearchResult = {
   id: number;
@@ -53,6 +54,9 @@ export default function SearchPage() {
         setTotalPages(data.total_pages || 0);
       } catch (error) {
         console.error("Initial search error:", error);
+        toast.error("Failed to fetch search results. Please try again later.", {
+          duration: 5000,
+        });
       } finally {
         setLoading(false);
       }
@@ -81,6 +85,9 @@ export default function SearchPage() {
       setPage(nextPage);
     } catch (error) {
       console.error("Load more pages error:", error);
+      toast.error("Failed to load more results. Please try again later.", {
+        duration: 5000,
+      });
     } finally {
       setLoading(false);
     }

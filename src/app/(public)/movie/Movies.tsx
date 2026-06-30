@@ -5,6 +5,7 @@ import { IconArrowDown, IconLoader, IconMovie } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type Movies = {
   id: number;
@@ -43,6 +44,9 @@ export default function Movies({
       setPage(nextPage);
     } catch (error) {
       console.error("Error loading more movies:", error);
+      toast.error("Failed to load more movies. Please try again later.", {
+        duration: 5000,
+      });
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import { IconArrowDown, IconLoader, IconMovie } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type People = {
   id: number;
@@ -44,6 +45,9 @@ export default function People({
       setPage(nextPage);
     } catch (error) {
       console.error("Error loading more people:", error);
+      toast.error("Failed to load more people. Please try again later.", {
+        duration: 5000,
+      });
     } finally {
       setLoading(false);
     }

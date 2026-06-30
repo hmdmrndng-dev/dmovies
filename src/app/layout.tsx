@@ -7,6 +7,10 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Footer } from "@/components/Footer";
 import { FloatingActions } from "@/app/shared/floating-actions";
 import { Analytics } from "@vercel/analytics/next";
+import { cookies } from "next/headers";
+import { tmdb } from "@/lib/tmdb";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -40,7 +44,7 @@ export const metadata: Metadata = {
     "React",
     "Shadcn UI",
     "Tailwind CSS",
-    "hmdmrndng"
+    "hmdmrndng",
   ],
 
   robots: {
@@ -49,11 +53,29 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get("tmdb_session_id")?.value || null;
+
+  let user = null;
+  if (sessionId) {
+    try {
+      const response = await tmdb.get(
+        `https://api.themoviedb.org/3/account?session_id=${sessionId}`,
+      );
+      user = response.data;
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to fetch user data. Please try again later.", {
+        duration: 5000,
+      });
+    }
+  }
+
   return (
     <html
       lang="en"
@@ -74,8 +96,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <main>{children}</main>
+          <Navbar user={user} />
+          <main>
+            {children}
+            <Toaster />
+          </main>
           <Footer />
           <FloatingActions />
         </ThemeProvider>

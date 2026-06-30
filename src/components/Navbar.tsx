@@ -4,10 +4,9 @@ import Link from "next/link";
 import { useState, Suspense } from "react";
 import { IconChevronDown, IconMenu2, IconX } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "next-themes";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Command } from "./ui/command";
 import { SearchBar } from "../app/shared/search-bar";
+import ProfileDropdown from "@/app/shared/profile-dropdown";
 
 type NavLink = { label: string; href: string };
 type NavItem = { label: string; href?: string; children?: NavLink[] };
@@ -35,7 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "About", href: "/about" },
 ];
 
-export default function Navbar() {
+export default function Navbar({ user }: { user: any }) {
   const [open, setOpen] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
@@ -47,17 +46,19 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <nav className="flex w-full items-center px-6 py-3 md:px-24 md:py-4 justify-between">
-        <Link
-          href="/"
-          className="text-lg font-bold tracking-tight text-primary"
-          onClick={closeMobile}
-        >
-          dmovies
-        </Link>
+      <nav className="flex items-center justify-between md:grid md:grid-cols-3 w-full px-6 py-3 md:px-24 md:py-4">
+        <div className="flex justify-start">
+          <Link
+            href="/"
+            className="text-lg font-bold tracking-tight text-primary"
+            onClick={closeMobile}
+          >
+            dmovies
+          </Link>
+        </div>
 
         {/* Desktop nav */}
-        <ul className="hidden items-center gap-1 md:flex">
+        <ul className="hidden items-center gap-1 md:flex justify-self-center">
           {NAV_ITEMS.map((data) =>
             data.children ? (
               <DropdownItem
@@ -80,7 +81,7 @@ export default function Navbar() {
           )}
         </ul>
 
-        <div className="flex gap-1">
+        <div className="flex items-center gap-2 justify-self-end">
           <Suspense>
             <SearchBar />
           </Suspense>
@@ -93,12 +94,15 @@ export default function Navbar() {
           >
             {mobileOpen ? <IconX /> : <IconMenu2 />}
           </Button>
+          <div className="hidden md:block">
+            <ProfileDropdown user={user} />
+          </div>
         </div>
       </nav>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="bg-background/95 px-4 pb-4 md:hidden">
+        <div className="px-6 pb-4 md:hidden">
           <ul className="flex flex-col gap-1 pt-2">
             {NAV_ITEMS.map((data) =>
               data.children ? (

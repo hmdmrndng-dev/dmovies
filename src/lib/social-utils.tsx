@@ -7,7 +7,6 @@ import {
   IconBrandYoutube,
 } from "@tabler/icons-react";
 
-// We define a lightweight type for the TMDB external IDs payload
 type ExternalIds = {
   imdb_id?: string | null;
   facebook_id?: string | null;
@@ -18,7 +17,6 @@ type ExternalIds = {
   youtube_id?: string | null;
 };
 
-// ✅ We export a function instead of a raw array
 export function getSocialLinks(externalIds: ExternalIds) {
   return [
     {

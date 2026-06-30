@@ -1,7 +1,12 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { IconLoader } from "@tabler/icons-react";
+import {
+  IconBookmark,
+  IconHeart,
+  IconLoader,
+  IconStar,
+} from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 type Genre = {
@@ -36,16 +41,20 @@ type MediaHeaderProps = {
   }>;
   hasMultipleBackdrops: boolean;
   onOpenTrailer: () => void;
+  onOpenLogin: () => void;
   isTrailerLoading: boolean;
   keywords: Keyword[];
+  user: any | null;
 };
 
 export default function MediaHeader({
   tv: movie,
   socialLinks,
   onOpenTrailer,
+  onOpenLogin,
   isTrailerLoading,
   keywords,
+  user,
 }: MediaHeaderProps) {
   return (
     <section>
@@ -126,12 +135,6 @@ export default function MediaHeader({
             </Badge>
             <Badge
               variant="outline"
-              className="flex items-center gap-1 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 font-semibold"
-            >
-              TMDB {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
-            </Badge>
-            <Badge
-              variant="outline"
               className={cn(
                 "px-2.5 py-0.5 font-bold tracking-wider uppercase",
                 movie.adult
@@ -178,6 +181,58 @@ export default function MediaHeader({
                 </Badge>
               </>
             ) : null}
+          </div>
+
+          <div className="flex gap-2 flex-wrap items-center">
+            <div className="flex flex-col items-center gap-1.5">
+              <Badge
+                variant="outline"
+                className="w-12 h-12 flex items-center justify-center text-lg font-bold hover:scale-120 transition-transform duration-200 cursor-default"
+              >
+                {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
+              </Badge>
+
+              <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
+                TMDB Rating
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <Button
+                variant="ghost"
+                className="w-12 h-12"
+                onClick={user ? undefined : onOpenLogin}
+              >
+                <IconStar className="!w-8 !h-8" />
+              </Button>
+
+              <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
+                What's your rating?
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <Button
+                variant="ghost"
+                className="w-12 h-12"
+                onClick={user ? undefined : onOpenLogin}
+              >
+                <IconHeart className="!w-8 !h-8" />
+              </Button>
+              <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
+                Add to favorites
+              </span>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <Button
+                variant="ghost"
+                className="w-12 h-12"
+                onClick={user ? undefined : onOpenLogin}
+              >
+                <IconBookmark className="!w-8 !h-8" />
+              </Button>
+              <span className="w-20 text-center text-[11px] font-medium text-muted-foreground leading-tight">
+                Add to watchlist
+              </span>
+            </div>
           </div>
 
           <div>

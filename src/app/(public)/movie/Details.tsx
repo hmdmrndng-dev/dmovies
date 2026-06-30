@@ -10,22 +10,14 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { pickTrailer, type Video } from "@/lib/video-utils";
-import { Button } from "@/components/ui/button";
 import { getSocialLinks } from "@/lib/social-utils";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import MediaHeader from "@/components/movie/sections/MediaHeader";
 import { cn } from "@/lib/utils";
 import Credits from "@/components/movie/sections/Credits";
 import Similar from "@/components/movie/sections/Similar";
-import { IconLoader, IconMovie, IconMovieOff } from "@tabler/icons-react";
+import { IconMovie } from "@tabler/icons-react";
+import Trailer from "@/app/shared/trailer-dialog";
+import LoginDialog from "@/app/shared/login-dialog";
 
 type Movies = {
   id: number;
@@ -98,6 +90,7 @@ export default function Details({
   externalIds,
   keywords,
   similar,
+  user,
 }: {
   movies: Movies;
   credits: MovieCredits;
@@ -105,8 +98,11 @@ export default function Details({
   externalIds: ExternalIds;
   keywords: Keywords[];
   similar: SimilarMovies[];
+  user: any | null;
 }) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<"trailer" | "login" | null>(
+    null,
+  );
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const socialLinks = getSocialLinks(externalIds);
@@ -130,7 +126,7 @@ export default function Details({
   const [loading, setLoading] = useState(false);
 
   async function openTrailer(data: Movies) {
-    setIsDialogOpen(true);
+    setActiveModal("trailer");
     setLoading(true);
     setTrailerTitle(data.title);
     setTrailerDescription(data.overview);
@@ -141,6 +137,10 @@ export default function Details({
     } finally {
       setLoading(false);
     }
+  }
+
+  async function openLogin() {
+    setActiveModal("login");
   }
 
   const backdropsList = images?.backdrops?.slice(0, 10) || [];
@@ -211,8 +211,10 @@ export default function Details({
           socialLinks={socialLinks}
           hasMultipleBackdrops={backdropsList.length > 1}
           onOpenTrailer={() => openTrailer(movies)}
+          onOpenLogin={openLogin}
           isTrailerLoading={loading}
           keywords={keywords}
+          user={user}
         />
         <Credits cast={credits.cast} />
 
@@ -221,47 +223,19 @@ export default function Details({
         <Similar similar={similar} />
       </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="w-[95vw] md:w-[88vw] lg:w-[80vw] xl:w-[75vw] sm:max-w-[1800px] p-2 sm:p-4 gap-3 border-none bg-zinc-950 text-white">
-          <DialogHeader>
-            <DialogTitle className="px-2 pt-2 sm:p-0 text-lg sm:text-xl font-bold tracking-tight">
-              {trailerTitle}
-            </DialogTitle>
-            <DialogDescription>{trailerDescription}</DialogDescription>
-          </DialogHeader>
-          {trailerKey ? (
-            <div className="aspect-video w-full overflow-hidden rounded-md bg-black shadow-2xl shadow-black/50">
-              <iframe
-                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
-                title={`${trailerTitle} Trailer`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="h-full w-full border-none"
-              />
-            </div>
-          ) : (
-            <div className="flex h-48 items-center justify-center rounded-md bg-black">
-              {loading ? (
-                <>
-                  <IconLoader className="ml-2 animate-spin" />
-                </>
-              ) : (
-                <IconMovieOff className="h-12 w-12 text-muted-foreground" />
-              )}
-            </div>
-          )}
-          <DialogFooter className="px-2 pb-2 sm:p-0">
-            <DialogClose asChild>
-              <Button
-                variant="secondary"
-                className="w-full sm:w-auto font-medium"
-              >
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Trailer
+        isOpen={activeModal === "trailer"}
+        onOpenChange={(open) => setActiveModal(open ? "trailer" : null)}
+        trailerKey={trailerKey}
+        trailerTitle={trailerTitle}
+        trailerDescription={trailerDescription}
+        loading={trailerKey === null && loading}
+      />
+
+      <LoginDialog
+        isOpen={activeModal === "login"}
+        onOpenChange={(open) => setActiveModal(open ? "login" : null)}
+      />
     </main>
   );
 }
