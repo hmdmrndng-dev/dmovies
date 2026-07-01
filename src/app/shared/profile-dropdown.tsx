@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { IconLogout, IconUser, IconLogin } from "@tabler/icons-react";
 import LoginDialog from "./login-dialog";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface ProfileDropdownProps {
   user: {
@@ -90,10 +91,12 @@ export default function ProfileDropdown({ user }: ProfileDropdownProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className={buttonStyle}>
           {avatarPath ? (
-            <img
-              src={`https://image.tmdb.org/t/p/w150_and_h150_face${avatarPath}`}
-              alt={user.username}
-              className="h-full w-full rounded-md object-cover" // 🎯 Changed to rounded-md to match the button frame
+            <Image
+              src={`https://image.tmdb.org/t/p/original${avatarPath}`}
+              alt={user.username || "User avatar"}
+              fill
+              className="rounded-md object-cover"
+              sizes="(100vw)"
             />
           ) : (
             <IconUser className="h-4 w-4" />

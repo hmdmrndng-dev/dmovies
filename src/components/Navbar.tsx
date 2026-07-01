@@ -5,6 +5,12 @@ import { useState, Suspense } from "react";
 import { IconChevronDown, IconMenu2, IconX } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { SearchBar } from "../app/shared/search-bar";
 import ProfileDropdown from "@/app/shared/profile-dropdown";
 
@@ -45,114 +51,35 @@ export default function Navbar({ user }: { user: any }) {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
-      <nav className="flex items-center justify-between md:grid md:grid-cols-3 w-full px-6 py-3 md:px-24 md:py-4">
-        <div className="flex justify-start">
-          <Link
-            href="/"
-            className="text-lg font-bold tracking-tight text-primary"
-            onClick={closeMobile}
-          >
-            dmovies
-          </Link>
-        </div>
-
-        {/* Desktop nav */}
-        <ul className="hidden items-center gap-1 md:flex justify-self-center">
-          {NAV_ITEMS.map((data) =>
-            data.children ? (
-              <DropdownItem
-                key={data.label}
-                item={data}
-                isOpen={open === data.label}
-                onOpen={() => setOpen(data.label)}
-                onClose={() => setOpen(null)}
-              />
-            ) : (
-              <li key={data.label}>
-                <Link
-                  href={data.href!}
-                  className={buttonVariants({ variant: "ghost", size: "lg" })}
-                >
-                  {data.label}
-                </Link>
-              </li>
-            ),
-          )}
-        </ul>
-
-        <div className="flex items-center gap-2 justify-self-end">
-          <Suspense>
-            <SearchBar />
-          </Suspense>
-          <Button
-            variant="ghost"
-            size="lg"
-            className="md:hidden"
-            onClick={() => setMobileOpen((prev) => !prev)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <IconX /> : <IconMenu2 />}
-          </Button>
-          <div className="hidden md:block">
-            <ProfileDropdown user={user} />
+    <>
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+        <nav className="flex items-center justify-between md:grid md:grid-cols-3 w-full px-6 py-3 md:px-24 md:py-4">
+          <div className="flex justify-start">
+            <Link
+              href="/"
+              className="text-lg font-bold tracking-tight text-primary"
+              onClick={closeMobile}
+            >
+              dmovies
+            </Link>
           </div>
-        </div>
-      </nav>
 
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="px-6 pb-4 md:hidden">
-          <ul className="flex flex-col gap-1 pt-2">
+          {/* Desktop nav */}
+          <ul className="hidden items-center gap-1 md:flex justify-self-center">
             {NAV_ITEMS.map((data) =>
               data.children ? (
-                <li key={data.label}>
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    className="w-full justify-between"
-                    onClick={() =>
-                      setMobileExpanded((prev) =>
-                        prev === data.label ? null : data.label,
-                      )
-                    }
-                  >
-                    {data.label}
-                    <IconChevronDown
-                      className={cn(
-                        "size-3.5 transition-transform",
-                        mobileExpanded === data.label && "rotate-180",
-                      )}
-                    />
-                  </Button>
-                  {mobileExpanded === data.label && (
-                    <ul className="ml-3 mt-1 flex flex-col border-l border-border pl-3">
-                      {data.children.map((child) => (
-                        <li key={child.href}>
-                          <Link
-                            href={child.href}
-                            className={cn(
-                              buttonVariants({ variant: "ghost", size: "lg" }),
-                              "w-full justify-start",
-                            )}
-                            onClick={closeMobile}
-                          >
-                            {child.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
+                <DropdownItem
+                  key={data.label}
+                  item={data}
+                  isOpen={open === data.label}
+                  onOpen={() => setOpen(data.label)}
+                  onClose={() => setOpen(null)}
+                />
               ) : (
                 <li key={data.label}>
                   <Link
                     href={data.href!}
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "lg" }),
-                      "w-full justify-start",
-                    )}
-                    onClick={closeMobile}
+                    className={buttonVariants({ variant: "ghost", size: "lg" })}
                   >
                     {data.label}
                   </Link>
@@ -160,9 +87,104 @@ export default function Navbar({ user }: { user: any }) {
               ),
             )}
           </ul>
-        </div>
-      )}
-    </header>
+
+          <div className="flex items-center gap-2 justify-self-end">
+            <Suspense>
+              <SearchBar />
+            </Suspense>
+            <Button
+              variant="ghost"
+              size="lg"
+              className="md:hidden"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Toggle menu"
+            >
+              <IconMenu2 />
+            </Button>
+            <div className="hidden md:block h-8">
+              <ProfileDropdown user={user} />
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      {/* Mobile bottom drawer */}
+
+      <Drawer open={mobileOpen} onOpenChange={setMobileOpen}>
+        <DrawerContent>
+          <DrawerHeader className="flex items-center justify-between px-6 pb-2">
+            <DrawerTitle className="text-base font-semibold">Menu</DrawerTitle>
+          </DrawerHeader>
+
+          <div className="px-4 pb-6">
+            <ul className="flex flex-col gap-1">
+              {NAV_ITEMS.map((data) =>
+                data.children ? (
+                  <li key={data.label}>
+                    <Button
+                      variant="ghost"
+                      size="lg"
+                      className="w-full justify-between"
+                      onClick={() =>
+                        setMobileExpanded((prev) =>
+                          prev === data.label ? null : data.label,
+                        )
+                      }
+                    >
+                      {data.label}
+                      <IconChevronDown
+                        className={cn(
+                          "size-3.5 transition-transform",
+                          mobileExpanded === data.label && "rotate-180",
+                        )}
+                      />
+                    </Button>
+                    {mobileExpanded === data.label && (
+                      <ul className="ml-3 mt-1 flex flex-col border-l border-border pl-3">
+                        {data.children.map((child) => (
+                          <li key={child.href}>
+                            <Link
+                              href={child.href}
+                              className={cn(
+                                buttonVariants({
+                                  variant: "ghost",
+                                  size: "lg",
+                                }),
+                                "w-full justify-start",
+                              )}
+                              onClick={closeMobile}
+                            >
+                              {child.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ) : (
+                  <li key={data.label}>
+                    <Link
+                      href={data.href!}
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "lg" }),
+                        "w-full justify-start",
+                      )}
+                      onClick={closeMobile}
+                    >
+                      {data.label}
+                    </Link>
+                  </li>
+                ),
+              )}
+            </ul>
+
+            <div className="mt-4 border-t border-border pt-4">
+              <ProfileDropdown user={user} />
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 }
 
