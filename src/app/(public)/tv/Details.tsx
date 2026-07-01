@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import LoginDialog from "@/app/shared/login-dialog";
 import { useMediaAction } from "@/hooks/useMediaAction";
 import { toast } from "sonner";
+import Seasons from "@/components/tv/sections/Seasons";
 
 type Tvs = {
   id: number;
@@ -34,6 +35,28 @@ type Tvs = {
   first_air_date: string | null;
   last_air_date: string | null;
   status: string;
+  seasons: Season[];
+};
+
+type Season = {
+  air_date: string | null;
+  episode_count: number;
+  id: number;
+  name: string;
+  overview: string;
+  poster_path: string | null;
+  season_number: number;
+  episodes: Episode[];
+};
+
+type Episode = {
+  air_date: string | null;
+  episode_number: number;
+  id: number;
+  name: string;
+  overview: string;
+  runtime: number | null;
+  still_path: string | null;
 };
 
 type TmdbImages = {
@@ -253,6 +276,9 @@ export default function Details({
           onWatchlist={toggleWatchlist}
           isWatchlistLoading={watchlistLoading}
         />
+
+        <Seasons seasons={tvs.seasons} />
+
         <Credits cast={credits.cast} />
 
         <Credits crew={credits.crew} />
